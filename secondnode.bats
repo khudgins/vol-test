@@ -28,8 +28,12 @@ load test_helper
   assert_success
 }
 
-@test "Destroy container on node 2" {
+@test "Stop container on node 2" {
   run $prefix2 docker stop mounter
+  assert_success
+}
+
+@test "Destroy container on node 2" {
   run $prefix2 docker rm mounter
   assert_success
 }

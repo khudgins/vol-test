@@ -53,8 +53,12 @@ load test_helper
   assert_success
 }
 
-@test "Destroy container" {
+@test "Stop container" {
   run $prefix docker stop mounter
+  assert_success
+}
+
+@test "Destroy container" {
   run $prefix docker rm mounter
   assert_success
 }
@@ -74,8 +78,12 @@ load test_helper
   assert_success
 }
 
-@test "Destroy container" {
+@test "Stop container" {
   run $prefix docker stop mounter
+  assert_success
+}
+
+@test "Destroy container" {
   run $prefix docker rm mounter
   assert_success
 }
