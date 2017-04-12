@@ -66,9 +66,9 @@ for droplet in $droplets; do
   ssh root@${ip} "mkdir /root/.docker 2>/dev/null"
   scp ~/.docker/config.json root@${ip}:/root/.docker/
 
-  echo "Setting up for core dumps"
+  echo "Enabling core dumps"
   ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-  ssh root@${ip} "env DEBIAN_FRONTEND=noninteractive apt-get -qqy install systemd-coredump"
+  ssh root@${ip} "env DEBIAN_FRONTEND=noninteractive apt-get -qqqy install systemd-coredump"
 
 done
 
