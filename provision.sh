@@ -78,6 +78,7 @@ echo "Clearing KV state"
 cat << EOF > test.env
 export VOLDRIVER="storageos/plugin:${version}"
 export PLUGINOPTS="KV_ADDR=${kv_addr}"
+export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 EOF

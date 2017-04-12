@@ -21,3 +21,5 @@ echo `$PREFIX2 docker volume rm testvol`
 echo `$PREFIX2 docker plugin disable $VOLDRIVER`
 
 echo `$PREFIX2 docker plugin rm $VOLDRIVER`
+
+[ -n $KV_ADDR ] && http delete ${KV_ADDR}/v1/kv/storageos?recurse
