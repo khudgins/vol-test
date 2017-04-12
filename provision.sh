@@ -12,6 +12,10 @@ size=2gb
 sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
 name_template=${tag}-${size}-${region}
 
+if [ -f user_provision.sh ]; then
+    echo "Loading user settings overrides from user_provision.sh"
+    . ./user_provision.sh
+fi
 
 droplets=$(doctl compute droplet list --tag-name ${tag} --format ID --no-header)
 
