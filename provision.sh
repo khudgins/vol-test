@@ -4,6 +4,7 @@ set +e
 declare -a ips
 
 version=0.7.2
+cli_version=0.0.4
 kv_addr=138.68.188.68:8500
 tag=vol-test
 region=lon1
@@ -12,13 +13,18 @@ size=2gb
 sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
 name_template=${tag}-${size}-${region}
 
+cli_binary=storageos_linux_amd64-${cli_version}
+if [ ! -f $cli_binary ]; then
+  curl -sSL https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64 > $cli_binary
+  chmod +x $cli_binary
+fi
 
 droplets=$(doctl compute droplet list --tag-name ${tag} --format ID --no-header)
 
 if [ -z "${droplets}" ]; then
   echo "Creating new droplets"
   doctl compute tag create $tag
-  for name in ${name_template}01 ${name_template}02; do
+  for name in ${name_template}01 ${name_template}02 ${name_template}03; do
     id=$(doctl compute droplet create \
       --image $image \
       --region $region \
@@ -40,19 +46,19 @@ for droplet in $droplets; do
 
   while [ "$status" != "active" ]; do
     sleep 2
-    status=$(doctl compute droplet get $droplet --format Status --no-header)
+    status=$(doctl compute droplet get ${droplet} --format Status --no-header)
   done
 
-  ip=$(doctl compute droplet get $droplet --format PublicIPv4 --no-header)
+  ip=$(doctl compute droplet get ${droplet} --format PublicIPv4 --no-header)
   ips+=($ip)
 
-  echo "Waiting for SSH on $ip"
-  until nc -zw 1 $ip 22; do
+  echo "Waiting for SSH on ${ip}"
+  until nc -zw 1 ${ip} 22; do
     sleep 2
   done
   sleep 5
 
-  ssh-keyscan -H $ip >> ~/.ssh/known_hosts
+  ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
   echo "Disabling firewall"
   until ssh root@${ip} "/usr/sbin/ufw disable"; do
     sleep 2
@@ -62,16 +68,22 @@ for droplet in $droplets; do
   ssh root@${ip} "mkdir /root/.docker 2>/dev/null"
   scp ~/.docker/config.json root@${ip}:/root/.docker/
 
+  echo "Copying StorageOS CLI"
+  scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
+  ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
+  ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
 done
 
 echo "Clearing KV state"
-[ -n $kv_addr ] && http delete ${kv_addr}/v1/kv/storageos?recurse
+[ -n "${kv_addr}" ] && http delete ${kv_addr}/v1/kv/storageos?recurse
 
 cat << EOF > test.env
 export VOLDRIVER="storageos/plugin:${version}"
 export PLUGINOPTS="KV_ADDR=${kv_addr}"
+export CLIOPTS="-u storageos -p storageos"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
+export PREFIX3="ssh root@${ips[2]}"
 EOF
 
 echo
