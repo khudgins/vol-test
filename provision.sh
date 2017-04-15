@@ -72,6 +72,13 @@ for droplet in $droplets; do
   scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
   ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
   ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
+
+  echo "Setting up for core dumps"
+  ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
+  ssh root@${ip} "env DEBIAN_FRONTEND=noninteractive apt-get -qqy install systemd-coredump"
+
+  echo "Enable NBD"
+  ssh root@${ip} "modprobe nbd nbds_max=1024"
 done
 
 echo "Clearing KV state"
