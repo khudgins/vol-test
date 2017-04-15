@@ -5,7 +5,7 @@ load test_helper
 @test "Test: Install plugin for driver ($driver) on node 2" {
   #skip "This test works, faster for rev without it"
   run $prefix2 docker plugin install --grant-all-permissions $driver $pluginopts
-  sleep 20
+  sleep 60
   assert_success
 }
 
