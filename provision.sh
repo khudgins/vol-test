@@ -3,12 +3,12 @@
 set +e
 declare -a ips
 
-version=0.7.2
+version=0.7.7
 cli_version=0.0.4
 kv_addr=138.68.188.68:8500
 tag=vol-test
 region=lon1
-image=23755729  # Docker on Ubuntu 16.04 64-bit
+image=24232340  # Docker on Ubuntu 16.04 64-bit
 size=2gb
 sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
 name_template=${tag}-${size}-${region}
@@ -37,7 +37,7 @@ if [ -z "${droplets}" ]; then
   done
 else
   for droplet in $droplets; do
-    echo "Rebuilding existing droplets"
+    echo "Rebuilding existing droplet ${droplet}"
     doctl compute droplet-action rebuild $droplet --image $image
   done
 fi
