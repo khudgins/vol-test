@@ -13,6 +13,11 @@ size=2gb
 sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
 name_template=${tag}-${size}-${region}
 
+if [ -f user_provision.sh ]; then
+    echo "Loading user settings overrides from user_provision.sh"
+    . ./user_provision.sh
+fi
+
 cli_binary=storageos_linux_amd64-${cli_version}
 if [ ! -f $cli_binary ]; then
   curl -sSL https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64 > $cli_binary
@@ -38,7 +43,7 @@ if [ -z "${droplets}" ]; then
 else
   for droplet in $droplets; do
     echo "Rebuilding existing droplet ${droplet}"
-    doctl compute droplet-action rebuild $droplet --image $image
+    doctl compute droplet-action rebuild "$droplet" --image $image
   done
 fi
 
@@ -46,27 +51,31 @@ for droplet in $droplets; do
 
   while [ "$status" != "active" ]; do
     sleep 2
-    status=$(doctl compute droplet get ${droplet} --format Status --no-header)
+    status=$(doctl compute droplet get "$droplet" --format Status --no-header)
   done
 
-  ip=$(doctl compute droplet get ${droplet} --format PublicIPv4 --no-header)
+  ip=$(doctl compute droplet get "$droplet" --format PublicIPv4 --no-header)
   ips+=($ip)
 
-  echo "Waiting for SSH on ${ip}"
-  until nc -zw 1 ${ip} 22; do
+  echo "Waiting for SSH on $ip"
+  until nc -zw 1 "$ip" 22; do
     sleep 2
   done
   sleep 5
 
-  ssh-keyscan -H ${ip} >> ~/.ssh/known_hosts
+  ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts
   echo "Disabling firewall"
-  until ssh root@${ip} "/usr/sbin/ufw disable"; do
+  until ssh "root@${ip}" "/usr/sbin/ufw disable"; do
     sleep 2
   done
 
   echo "Copying ~/.docker/config.json (auth needed for private beta)"
-  ssh root@${ip} "mkdir /root/.docker 2>/dev/null"
-  scp ~/.docker/config.json root@${ip}:/root/.docker/
+  ssh "root@${ip}" "mkdir /root/.docker 2>/dev/null"
+  scp ~/.docker/config.json "root@${ip}:/root/.docker/"
+
+  echo "Enabling core dumps"
+  ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
+  ssh "root@${ip}" "env DEBIAN_FRONTEND=noninteractive apt-get -qqqy install systemd-coredump"
 
   echo "Copying StorageOS CLI"
   scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
@@ -82,12 +91,13 @@ for droplet in $droplets; do
 done
 
 echo "Clearing KV state"
-[ -n "${kv_addr}" ] && http delete ${kv_addr}/v1/kv/storageos?recurse
+[ -n "$kv_addr" ] && http delete ${kv_addr}/v1/kv/storageos?recurse
 
 cat << EOF > test.env
 export VOLDRIVER="storageos/plugin:${version}"
 export PLUGINOPTS="KV_ADDR=${kv_addr}"
 export CLIOPTS="-u storageos -p storageos"
+export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 export PREFIX3="ssh root@${ips[2]}"
