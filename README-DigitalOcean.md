@@ -207,7 +207,7 @@ On the client, set the product version  in `user_provision.sh`:
 
 ```
 version=0.7.7
-kv_addr=138.68.186.32:8500
+kv_addr=66.66.66.32:8500
 sshkey=5b:2a:e0:e2:f9:44:a2:41:81:90:42:22:57:3a:fd:79
 ```
 
