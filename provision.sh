@@ -106,6 +106,6 @@ EOF
 echo
 echo "SUCCESS!  Ready to run tests:"
 echo "  source test.env"
-echo "  bats singlenode.bats"
-echo "  bats secondnode.bats"
+echo "  ./run-volume-tests.sh"
+
 echo

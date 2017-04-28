@@ -11,4 +11,6 @@
 #PLUGINOPTS='PLUGIN_API_KEY="keystring goes here" PLUGIN_API_HOST="192.168.42.97"'
 #CREATEOPTS='-o profile=database'
 
+pushd docker-acceptance
 bats singlenode.bats secondnode.bats
+popd

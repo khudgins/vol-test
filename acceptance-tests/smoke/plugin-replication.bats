@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load test_helper
+load ../../test_helper
 
 @test "Create replicated volume using driver ($driver)" {
   run $prefix2 docker volume create --driver $driver $createopts --opt storageos.feature.replicas=1 repvol1

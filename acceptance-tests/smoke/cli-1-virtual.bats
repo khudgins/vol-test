@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load test_helper
+load "../../test_helper"
 
 # Basic
 @test "Create volume using storageos cli" {

@@ -1,9 +1,14 @@
 #!/usr/bin/env bats
 
-load test_helper
+load "../test_helper"
 
 @test "Test: Install plugin for driver ($driver)" {
   #skip "Faster for rev during development without it - leave driver installed"
+  run $prefix -t "docker plugin ls | grep $driver"
+  if [[ $status -eq 0 ]]; then
+    skip
+  fi
+
   run $prefix docker plugin install --grant-all-permissions $driver $pluginopts
   sleep 60
   assert_success

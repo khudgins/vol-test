@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
-load test_helper
+
+# is this test up to date?
+load ../test_helper
 
 @test "Install plugin for driver ($driver) on 1st node" {
   run $prefix docker plugin install --grant-all-permissions $driver $pluginopts
