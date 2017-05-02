@@ -4,16 +4,19 @@ load ../../test_helper
 
 export VOL_NAME=vol1
 export NAMESPACE=test
+export FULL_NAME=$NAMESPACE/$VOL_NAME
+
+vol_prefix="$prefix storageos $cliopts volume"
 
 @test "create disk with size, description and fstype" {
   # awaiting bug fix for description: DEV-1238
-  run $prefix storageos $cliopts volume create  -f reiserfs -d '1Gbdiskfordiskcreatetests' -s 1 -n $NAMESPACE $VOL_NAME
+  run $vol_prefix create  -f reiserfs -d \'1Gb disk for disk create tests\' -s 1 -n $NAMESPACE $VOL_NAME
   assert_success
-  assert_output $NAMESPACE/$VOL_NAME
+  assert_output $FULL_NAME
 }
 
 @test "create disk - no name" {
-  run $prefix storageos $cliopts volume create -n $NAMESPACE
+  run $vol_prefix create -n $NAMESPACE
   assert_failure
   # current error message is bad.. should be stopped at cli and not return from api
   # message should contain please provide name for disk :
@@ -21,49 +24,58 @@ export NAMESPACE=test
 }
 
 @test "create disk -  no namespace" {
-  run $prefix storageos $cliopts volume create nonamespace
+  run $vol_prefix create nonamespace
   assert_failure
   assert_output --partial "no namespace provided"
 }
 
 @test "create disk - already exists in namespace" {
-  run $prefix storageos $cliopts volume create  -n $NAMESPACE -s 1 $VOL_NAME
+  run $vol_prefix create  -n $NAMESPACE -s 1 $VOL_NAME
   assert_failure
   assert_output --partial "Volume with name '$VOL_NAME' already exists"
 }
 
 @test "inspect disk " {
-  run $prefix storageos $cliopts volume inspect  $NAMESPACE/$VOL_NAME
+  run $vol_prefix inspect $FULL_NAME
   echo $output | jq 'first.namespace == "test"'
   echo $output | jq 'first.fsType == "reiserfs"'
-  # TODO: there should be a way to inject var to jq expression .. just not on friday..
-  echo $output | jq 'first.name == "vol1"'
+  echo $output | jq "first.name == \"$VOL_NAME\""
   echo $output | jq 'first.size == 1'
   echo $output | jq 'first.master.status == "active"'
 }
 
 @test "inspect - no disk" {
-  run $prefix storageos $cliopts volume inspect
+  run $vol_prefix inspect
   assert_failure
 }
 
 @test "update - size to 2gb" {
-  run $prefix storageos $cliopts volume update -s 2 $NAMESPACE/$VOL_NAME
-  run $prefix storageos $cliopts volume inspect test/test
+  run $vol_prefix update -s 2 $FULL_NAME
+  run $vol_prefix inspect $FULL_NAME
   echo $output | jq 'first.size == 2'
 }
 
 @test "update - size 0" {
-  run $prefix storageos $cliopts volume update -s 0 $NAMESPACE/$VOL_NAME
+  run $vol_prefix update -s 0 $FULL_NAME
   assert_failure
 }
 
 @test "update - size negative" {
-  run $prefix storageos $cliopts volume update -s -1 $NAMESPACE/$VOL_NAME
+  run $vol_prefix update -s -1 $FULL_NAME
   assert_failure
 }
 
 @test "delete disk" {
-  run $prefix storageos $cliopts volume rm "$NAMESPACE/$VOL_NAME"
+  run $vol_prefix rm $FULL_NAME
   assert_success
+}
+
+@test "delete disk not present" {
+  run $vol_prefix rm "NONEXIST/NONEXIST"
+  assert_failure
+}
+
+@test "delete disk - no disk" {
+  run $vol_prefix rm
+  assert_failure
 }
