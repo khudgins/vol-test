@@ -49,6 +49,13 @@ vol_prefix="$prefix storageos $cliopts volume"
   assert_failure
 }
 
+@test "mount disk" {
+
+}
+
+@test "unmount disk" {
+}
+
 @test "update - size to 2gb" {
   run $vol_prefix update -s 2 $FULL_NAME
   run $vol_prefix inspect $FULL_NAME

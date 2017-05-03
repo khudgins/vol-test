@@ -11,6 +11,21 @@
 #PLUGINOPTS='PLUGIN_API_KEY="keystring goes here" PLUGIN_API_HOST="192.168.42.97"'
 #CREATEOPTS='-o profile=database'
 
-pushd docker-acceptance
+pushd docker-plugin
+echo "-----------------------------"
+echo "installing plugin on 3 nodes"
+echo "-----------------------------"
+bats install_plugin.bats
+echo "-----------------------------"
+echo "running docker acceptance tests"
+echo "-----------------------------"
 bats singlenode.bats secondnode.bats
 popd
+
+for f in acceptance-tests/**/*bats ; do
+  echo "-----------------------------"
+  echo "$(basename $f) tests in $(dirname $f) suite "
+  echo "-----------------------------"
+  bats $f
+done
+

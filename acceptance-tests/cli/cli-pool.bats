@@ -2,14 +2,18 @@
 
 load ../../test_helper
 
-export POOL=test-pool
+export POOL1=pool1
+export POOL1_3=pool13
 export DESCRIPTION="pool test suite"
+export NODE1=$($prefix 'echo $HOSTNAME')
+export NODE2=$($prefix2 'echo $HOSTNAME')
+export NODE3=$($prefix3 'echo $HOSTNAME')
+export NAMESPACE="test"
 
 pool_prefix="$prefix storageos $cliopts pool"
 
-
-@test "create pool w description for node 1" {
-  run $pool_prefix create -d \'$DESCRIPTION\' -drivers filesystem  $POOL
+@test "create pool w description for node 1, bogus driver, controller (no check)" {
+  run $pool_prefix create -d \'$DESCRIPTION\' --drivers quantumdriver --controllers $NODE1 --controllers "bogus" $POOL1
   assert_success
 }
 
@@ -23,53 +27,39 @@ pool_prefix="$prefix storageos $cliopts pool"
   assert_failure
 }
 
-@test "can create disk in pool" {
-  run $prefix storageos $cliopts volume create -n $POOL test
+@test "can make pool for node 1 and 3" {
+  run $pool_prefix create -d \'$DESCRIPTION\' --drivers filesystem --controllers "$NODE1" --controllers "$NODE3" $POOL1_3
   assert_success
 }
 
-@test "cannot create same disk in same pool" {
-  run $prefix storageos $cliopts volume create -n $POOL test
-  assert_failure
-}
-
-@test "can create/delete disk in other pool" {
-  run $prefix storageos $cliopts volume create -n "other" test
-  assert_success
-  run $prefix storageos $cliopts volume rm other/test
-  assert_success
-}
-
-@test "inspect pool" {
+@test "inspect pools" {
   # description is not used..
-  run $pool_prefix inspect $pool
-  echo $output | jq 'first.name == "test-pool"'
-  echo $output | jq 'first.description == "description for pool suite"'
+  run $pool_prefix inspect $POOL1
+  echo $output | jq "first.name == \"$POOL1\""
+  echo $output | jq 'first.driver == "quantumdriver"'
+  echo $output | jq 'first.controllers | length == 2'
+}
+
+@test "create 2 replica volume in pool1_3, it should have 1/2 replicas" {
+  run $prefix3 storageos $cliopts volume create -n $NAMESPACE -p $POOL1_3 --label 'storageos.feature.replicas=2' "2replicavolume"
+  assert_success
+  run $prefix storageos $cliopts volume inspect $NAMESPACE/2replicavolume
+  echo $output | jq '(first.replicas | length) == 1'
 }
 
 @test "list pool" {
   run $pool_prefix ls
-  assert_output --partial $POOL
+  assert_output --partial $POOL1
+  assert_output --partial $POOL1_3
   assert_output --partial $DESCRIPTION
 }
 
-@test "update description" {
-  run $pool_prefix update $POOL --description \'new description\'
+@test "delete pools" {
+  run $prefix storageos $cliopts volume rm $NAMESPACE/2replicavolume
   assert_success
-  run $pool_prefix inspect $POOL
-  echo $output | jq 'first.description == "new description"'
-}
-
-@test "update display name" {
-  run $pool_prefix update $POOL --display-name "short"
+  run $pool_prefix rm $POOL1
   assert_success
-  run $pool_prefix inspect $POOL
-  echo $output | jq 'first.displayName == "short"'
-}
-
-@test "delete pool" {
-  run $pool_prefix rm $POOL
-  assert_success
-  run '$pool_prefix ls | grep $pool'
+  run $pool_prefix rm $POOL1_3
+  run "$pool_prefix ls | grep -e $POOL1 -e $POOL1_3"
   assert_failure
 }
