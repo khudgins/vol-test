@@ -318,3 +318,25 @@ Anything other than zero failures is bad.
 ## Re-running the tests
 
 Re-run starting with the `provision.sh` step. It doesn't take that long to re-provision and it's completely automatic.
+
+## Image refresh
+
+We need a Docker-on-Ubuntu-16.04 image. Sometimes this gets updated and the existing `provision.sh` script will fail. I find the current image with:
+
+```
+$ doctl compute image list |grep docker
+23219707    Docker 17.03.0-ce on 14.04                           snapshot    Ubuntu          docker                  true      20
+24445730    Docker 17.04.0-ce on 16.04                           snapshot    Ubuntu          docker-16-04            true      20
+```
+
+We want the second one. Copy the first integer field into `provision.sh`:
+
+```
+... other definitions ...
+
+image=24445730
+
+...
+```
+
+This should unbreak provisioning runs.
