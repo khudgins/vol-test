@@ -101,6 +101,7 @@ export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 export PREFIX3="ssh root@${ips[2]}"
+export DO_TAG="${tag}"
 EOF
 
 echo

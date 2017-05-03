@@ -28,3 +28,16 @@ for h in $hosts; do
         echo "-- Skipping $h"
     fi
 done
+
+droplet_ids=""
+if [ -z "$DO_TAG" ]; then
+    echo "\$DO_TAG is not set, skipping Droplet deletion"
+else
+    echo "Deleting DO hosts tagged '$DO_TAG'"
+    droplet_ids="$(doctl compute droplet list -o json | jq "[.[] | select(.tags[] | contains(\"${DO_TAG}\"))] | .[] .id")"
+fi
+
+for d in $droplet_ids; do
+    echo "Delete droplet $d"
+    doctl compute droplet delete -f "$d"
+done
