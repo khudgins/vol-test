@@ -16,7 +16,7 @@ ip=$(echo $KV_ADDR | perl -ne 'print "$1\n" if m/([0-9.]+)(:\d+)?$/;')
 hosts="$hosts $ip"
 
 # Formatting OCD.
-hosts="$(echo $hosts | tr -s ':space:')"
+hosts="$(echo "$hosts" | tr -s ':space:')"
 
 echo "Hosts: $hosts"
 for h in $hosts; do
