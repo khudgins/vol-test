@@ -50,10 +50,13 @@ vol_prefix="$prefix storageos $cliopts volume"
 }
 
 @test "mount disk" {
-
+  run $vol_prefix mount $FULL_NAME /media/testmount
+  assert_success
 }
 
 @test "unmount disk" {
+  run $vol_prefix unmount -f $FULL_NAME
+  assert_success
 }
 
 @test "update - size to 2gb" {
