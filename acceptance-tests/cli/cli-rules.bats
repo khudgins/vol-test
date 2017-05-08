@@ -3,15 +3,20 @@
 load ../../test_helper
 
 export NAMESPACE=test
+export NAMESPACE_WRONG=test2
 
 export REPL_RULE_NAME='replicator'
-export FRULE_NAME="$NAMESPACE/$RULE_NAME"
+export FREPL_RULE_NAME="$NAMESPACE/$REPL_RULE_NAME"
 
 export NO_REPL_RULE_NAME='de-replicator'
-export FNO_REPL_RULE_NAME="$NAMESPACE/$RULE_NAME"
+export FNO_REPL_RULE_NAME="$NAMESPACE/$NO_REPL_RULE_NAME"
 
-export VOL_NAME='rule-test-volume'
-export FVOL_NAME="$NAMESPACE/$VOL_NAME"
+export VOL_BASE='rule-test-volume'
+
+export VOL1=${VOL_BASE}-1
+export VOL2=${VOL_BASE}-2
+export VOL3=${VOL_BASE}-3
+export VOL4=${VOL_BASE}-4
 
 rule_prefix="$prefix storageos $cliopts rule"
 vol_prefix="$prefix storageos $cliopts volume"
@@ -30,54 +35,59 @@ vol_prefix="$prefix storageos $cliopts volume"
 	assert_success
 }
 
-@test "add norepl label to $NAMESPACE namespace" {
-	run $prefix storageos $cliopts namespace update $NAMESPACE --label-add "no-repl=true"
+@test "attach norepl namespace label to $NAMESPACE" {
+	run $prefix storageos $cliopts namespace update --label-add "no-repl=true" $NAMESPACE
 	assert_success
 }
 
 @test "create volume in namespace $NAMESPACE, rule is applied" {
+	run $vol_prefix create -n $NAMESPACE $VOL1
+	assert_success
+	run $vol_prefix inspect $NAMESPACE/$VOL1
+	echo $output | jq "first.labels | contains({\"no-repl\":\"true\"})"
+	echo $output | jq 'first.labels | contains({"storageos.feature.replicas":"1"}) | not'
 }
 
 @test "create test volume in $NAMESPACE namespace with repl=true label" {
-	run $vol_prefix create -n $NAMESPACE $VOL_NAME --label 'repl=true'
+	run $vol_prefix create -n $NAMESPACE $VOL2 --label 'repl=true'
 	assert_success
 }
 
-@test "namespace rule has precedence?" {
-	run $prefix storageos $cliopts volume inspect $FVOL_NAME
-	echo $output | jq '"no-repl=true" in first.labels'
+@test "namespace label should have precedence" {
+	run $prefix storageos $cliopts volume inspect "$NAMESPACE/$VOL2"
+	echo $output | jq 'first.labels | contains({"no-repl":"true"})'
+	echo $output | jq 'first.labels | contains({"storageos.feature.replicas":"1"}) | not'
 }
 
-@test "add same rule high priority in diff namespace (no effect)" {
-	run $rule_prefix create -n test2 -w 10 --selector 'no-repl=true' --action add \
-		--label test=veryyes \'MEANINGLESS RULE\'
+@test "add same rule high priority in diff namespace" {
+	run $rule_prefix create -n $NAMESPACE_WRONG --selector 'no-repl=true' --action add \
+		--label namespace=different $NO_REPL_RULE_NAME
 	assert_success
-	run $prefix storageos $
 }
 
-@test "create label for specific volume in namespace, lower weight" {
-	run $rule_prefix update $FREPL_RULE_NAME -w 3
+@test "update rule weigh (lower) and observe effect on volume" {
+	run $rule_prefix update  -w 3 $FREPL_RULE_NAME
 	assert_success
-	run $vol_prefix create -n $NAMESPACE ${VOL_NAME}-2 ${F_VOL_NAME}-2
+	run $vol_prefix create -n $NAMESPACE $VOL3
 }
 
 @test "deactivate rule, removes replication label" {
-	run $rule_prefix update $FRULE_NAME --active false
+	run $rule_prefix update  --active=false $FREPL_RULE_NAME
 	assert_success
-	run $vol_prefix create -n $NAMESPACE ${VOL_NAME}-3 --label 'repl=true'
+	run $vol_prefix create -n $NAMESPACE $VOL4 --label 'repl=true'
 	assert_success
 }
 
-# @test "list rules" {
-# 	run $rule_prefix ls
-# 	assert_output --partial $FNAME
-#   assert_output --partial 'storageos.feature.replicas=1'
-# }
+@test "list rules" {
+	run $rule_prefix ls
+	assert_output --partial $NO_REPL_RULE_NAME
+  assert_output --partial $REPL_RULE_NAME
+}
 
 @test "inspect rule" {
-	run $rule_prefix inspect "$FNAME"
-	echo $output | jq "first.name == $RULE_NAME"
-	echo $output | jq "first.namespace == $NAMESPACE"
+	run $rule_prefix inspect "$FREPL_RULE_NAME"
+	echo $output | jq "first.name == \"$REPL_RULE_NAME\""
+	echo $output | jq "first.namespace == \"$NAMESPACE\""
 	echo $output | jq "first.weight == 10"
 	echo $output | jq 'first.selector == "env=staging"'
 }
@@ -85,9 +95,9 @@ vol_prefix="$prefix storageos $cliopts volume"
 @test "delete rules and volume" {
 	run $rule_prefix rm $FNO_REPL_RULE_NAME
 	assert_success
+	run $rule_prefix rm $FREPL_RULE_NAME
+	assert_success
 
-	$vol_prefix rm $FVOL_NAME
-	$vol_prefix rm $FVOL_NAME-2
-	$vol_prefix rm $FVOL_NAME-3
-	$prefix namespace rm test2
+	$prefix storageos $cliopts namespace rm $NAMESPACE_WRONG
+	$prefix storageos $cliopts namespace rm $NAMESPACE
 }

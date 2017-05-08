@@ -50,12 +50,14 @@ vol_prefix="$prefix storageos $cliopts volume"
 }
 
 @test "mount disk" {
+  fail # currently know to fail due to mount propagation bug..
   run $vol_prefix mount $FULL_NAME /media/testmount
   assert_success
 }
 
 @test "unmount disk" {
-  run $vol_prefix unmount -f $FULL_NAME
+  fail # currently know to fail due to mount propagation bug..
+  run $vol_prefix unmount $FULL_NAME
   assert_success
 }
 

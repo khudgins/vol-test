@@ -8,7 +8,7 @@ cli_version=0.0.4
 kv_addr=138.68.188.68:8500
 tag=vol-test
 region=lon1
-image=24232340  # Docker on Ubuntu 16.04 64-bit
+image=24445730 # ubuntu on linux img
 size=2gb
 sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
 name_template=${tag}-${size}-${region}
@@ -75,7 +75,7 @@ for droplet in $droplets; do
 
   echo "Enabling core dumps"
   ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-  ssh "root@${ip}" "env DEBIAN_FRONTEND=noninteractive apt-get -qqqy install systemd-coredump"
+  ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqqy install systemd-coredump"
 
   echo "Copying StorageOS CLI"
   scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
@@ -84,7 +84,7 @@ for droplet in $droplets; do
 
   echo "Setting up for core dumps"
   ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-  ssh root@${ip} "env DEBIAN_FRONTEND=noninteractive apt-get -qqy install systemd-coredump"
+  ssh root@${ip} "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqy install systemd-coredump"
 
   echo "Enable NBD"
   ssh root@${ip} "modprobe nbd nbds_max=1024"
