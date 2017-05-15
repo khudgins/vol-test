@@ -20,9 +20,40 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
     git clone https://github.com/khudgins/vol-test
     cd vol-tests
     git submodule update --recursive --remote
-    ```
+```
+
+## Provisioning
+
+
+- as a standalone run of the automated tests (currently in digital ocean):
+
+if it's the first time or machines need to be created from scratch in digital 
+ocean set BOOTSTRAP and run provision.sh , you can tell if it's the first time
+if there are no machines tagged vol-test or consul-vol-test in the Digital Ocean
+shared account.
+
+This will create 3 node cluster in digital ocean and a separate consul VM 
+running a consul container.
+
+On subsequent runs or if you can see that VMS with tags vol-test and consul-node are 
+already created unset BOOTSTRAP this will have the advantage of reusing the VMS and your tests will be quicker.
+
+- as a Jenkins run:
+
+When the script is run as part of a Jenkins run these vars have to be set:
+
+1. A unique build number which will be used in tags passed through BUILD ENV variable
+1. The fingerprint of JENKINS SSH KEY which should have been previously added to DO
+1. `JENKINS_JOB` has to be set to "true"
+
+You can also optionally set the 
+`VERSION` or `CLI_VERSION` environment variables for plugin version and CLI version
+respectively.
 
 ## Running
+
+source the test.env script as prompted after provisioning, and then 
+call ./run_volume_test.sh from the top level.
 
 - Configuration:
 
