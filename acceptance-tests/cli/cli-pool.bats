@@ -55,8 +55,9 @@ pool_prefix="$prefix storageos $cliopts pool"
 }
 
 @test "delete pools" {
-  run $prefix storageos $cliopts volume rm $NAMESPACE/2replicavolume
-  assert_success
+  $prefix storageos $cliopts volume rm $NAMESPACE/2replicavolume
+  $prefix storageos $cliopts namespace rm test
+
   run $pool_prefix rm $POOL1
   assert_success
   run $pool_prefix rm $POOL1_3

@@ -76,7 +76,8 @@ namespace_prefix="$prefix storageos $cliopts namespace"
 @test "delete namespace" {
   run $namespace_prefix rm $NAMESPACE
   assert_success
-  run '$namespace_prefix ls | grep $NAMESPACE'
+  run $namespace_prefix rm other
+  run '$namespace_prefix ls | grep -e $NAMESPACE -e other'
   assert_failure
 }
 
