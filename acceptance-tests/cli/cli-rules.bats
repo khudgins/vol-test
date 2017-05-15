@@ -71,16 +71,6 @@ vol_prefix="$prefix storageos $cliopts volume"
 	assert_success
 }
 
-@test "update rule weigh (lower) and observe effect on volume" {
-	run $rule_prefix update  --weight=3 "$FNOREPL_RULE_NAME"
-	assert_success
-	run $vol_prefix create -n "$NAMESPACE" "$VOL3"
-	assert_success
-	run $vol_prefix inspect "$NAMESPACE/VOL3"
-	echo $output | jq 'first.labels | contains({"repl":"true"})'
-	echo $output | jq 'first.labels | contains({"storageos.feature.replicas":"1"})'
-}
-
 @test "deactivate rule, removes replication label" {
 	run $rule_prefix update  --active=false "$FREPL_RULE_NAME"
 	assert_success
@@ -105,8 +95,8 @@ vol_prefix="$prefix storageos $cliopts volume"
 @test "create rule defaults" {
   run $rule_prefix create test-defaults -n default --label app=xx
   assert_success
-  run $rule_prefix inspect test-defaults
-  echo $output | jq "first.weight == \"5\""
+  run $rule_prefix inspect default/test-defaults
+  echo $output | jq "first.weight == \"4\""
 }
 
 @test "delete rules and volume" {
