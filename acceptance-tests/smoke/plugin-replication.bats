@@ -3,22 +3,22 @@
 load ../../test_helper
 
 @test "Create replicated volume using driver ($driver)" {
-  run $prefix2 docker volume create --driver $driver $createopts --opt storageos.feature.replicas=1 repvol1
+  run $prefix2 docker volume create --driver $driver $createopts --opt storageos.feature.replicas=1 repl-vol
   assert_success
 }
 
 @test "Confirm volume is created (volume ls) using driver ($driver)" {
   run $prefix2 docker volume ls
-  assert_line --partial "repvol1"
+  assert_line --partial "repl-vol"
 }
 
 @test "Confirm volume has 1 replica using storageos cli" {
-  run $prefix2 storageos $cliopts volume inspect default/repvol1
+  run $prefix2 storageos $cliopts volume inspect default/repl-vol
   assert_line --partial "\"storageos.feature.replicas\": \"1\"",
 }
 
 @test "Start a container and mount the volume on node 2" {
-  run $prefix2 docker run -it -d --name mounter -v repvol1:/data ubuntu /bin/bash
+  run $prefix2 docker run -it -d --name mounter -v repl-vol:/data ubuntu /bin/bash
   assert_success
 }
 
@@ -58,7 +58,7 @@ load ../../test_helper
 }
 
 @test "Confirm checksum on node 1" {
-  run $prefix -t docker run -it --rm -v repvol1:/data ubuntu md5sum --check /data/checksum
+  run $prefix -t docker run -it --rm -v repl-vol:/data ubuntu md5sum --check /data/checksum
   assert_success
 }
 
@@ -67,7 +67,7 @@ load ../../test_helper
   assert_success
 }
 
-# @test "Delete volume using storageos cli" {
-#   run $prefix2 storageos $cliopts volume rm default/repvol1
-#   assert_success
-# }
+@test "Delete volume using storageos cli" {
+  run $prefix storageos $cliopts volume rm -f default/repl-vol
+  assert_success
+}

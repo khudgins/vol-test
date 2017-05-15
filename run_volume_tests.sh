@@ -16,6 +16,7 @@ echo "-----------------------------"
 echo "installing plugin on 3 nodes"
 echo "-----------------------------"
 bats install_plugin.bats
+sleep 30
 echo "-----------------------------"
 echo "running docker acceptance tests"
 echo "-----------------------------"
