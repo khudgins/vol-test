@@ -27,22 +27,20 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
 
 - as a standalone run of the automated tests (currently in digital ocean):
 
-if it's the first time or machines need to be created from scratch in digital 
-ocean set BOOTSTRAP and run provision.sh , you can tell if it's the first time
-if there are no machines tagged vol-test or consul-vol-test in the Digital Ocean
-shared account.
+Depending on whether machines need to be created from scratch in digital ocean set `BOOTSTRAP` env variable and run `provision.sh` from top level directory.
+You can check if the cluster has been built before or not by verifying are no machines tagged vol-test or consul-vol-test in the Digital Ocean shared account.
 
-This will create 3 node cluster in digital ocean and a separate consul VM 
-running a consul container.
+This will create 3 node cluster in digital ocean and a separate consul VM running a consul container.
 
 On subsequent runs or if you can see that VMS with tags vol-test and consul-node are 
-already created unset BOOTSTRAP this will have the advantage of reusing the VMS and your tests will be quicker.
+already created unset `BOOTSTRAP` and run `provision.sh` this will have the advantage of reusing the VMS and your tests will be quicker.
 
 - as a Jenkins run:
 
 When the script is run as part of a Jenkins run these vars have to be set:
 
-1. A unique build number which will be used in tags passed through BUILD ENV variable
+1. A unique build number which will be used in tags passed through `BUILD` ENV variable
+1. A `DO_KEY` env variable containing an API key for jenkins functional account in Digital Ocean
 1. The fingerprint of JENKINS SSH KEY which should have been previously added to DO
 1. `JENKINS_JOB` has to be set to "true"
 

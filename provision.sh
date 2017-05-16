@@ -126,7 +126,7 @@ function provision_consul() {
     ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
 
     ip=$(doctl compute droplet get "$id" --format PublicIPv4 --no-header)
-    ssh root@$ip 'docker stop -f consul-single-node'
+    ssh root@$ip 'docker stop consul-single-node'
     ssh root@$ip 'docker rm consul-single-node'
     ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
   fi
@@ -135,9 +135,15 @@ function provision_consul() {
 
 }
 
+function do_auth_init()
+{
+  doctl auth init <<< $DO_TOKEN
+}
+
 function MAIN()
 {
   set -x
+  do_auth_init
   download_storageos_cli
   provision_consul
   provision_do_nodes
