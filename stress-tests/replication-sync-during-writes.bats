@@ -5,7 +5,7 @@ load ../test_helper
 export NAMESPACE=test
 
 @test "Create non-replicated volume using driver ($driver)" {
-  run $prefix2 docker volume create --driver $driver --opt namespace="$NAMESPACE" --opt size=10 stress-sync
+  run $prefix2 docker volume create --driver $driver --opt size=10 stress-sync
   assert_success
 }
 
@@ -22,16 +22,16 @@ export NAMESPACE=test
 @test "initiate big write in background then trigger replication" {
   $prefix2 docker exec 'mounter dd if=/dev/urandom of=/data/random bs=10M count=100' &
   # wait a little just to ensure operation is in progress..
-  sleep 5
+  sleep 2
 # Add replication
-  run $prefix2 storageos $cliopts volume update --label-add 'storageos.feature.replication=2' $NAMESPACE/stress-sync
+  run $prefix2 storageos $cliopts volume update --label-add 'storageos.feature.replication=2' default/stress-sync
   assert_success
 }
 
-# # @test "Wait for replication, Get a checksum for that binary file" {
-# #   run $prefix2 -t 'docker exec -it mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
-# #   assert_success
-# # }
+# @test "Wait for replication, Get a checksum for that binary file" {
+#   run $prefix2 -t 'docker exec -it mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
+#   assert_success
+# }
 
 # # @test "Confirm checksum on node 2" {
 # #   run $prefix2 -t docker exec -it mounter md5sum --check /data/checksum
