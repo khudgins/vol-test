@@ -28,7 +28,26 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
 
 ### as a standalone run of the automated tests (currently in digital ocean):
 
-Depending on whether machines need to be created from scratch in digital ocean set `BOOTSTRAP` env variable and run `provision.sh` from top level directory.
+### SSH key
+
+Set your ssh key fingerprint in `user_provision.sh` in the source directory (the same directory as `provision.sh`, probably the same directory as this document). Create `user_provision.sh` if necessary.
+
+The key fingerprint can be found in the DO settings, it's not the key itself. Alternatively, you can get it from your key:
+
+```
+ssh-keygen -l -E md5 -f ~/.ssh/id_rsa.pub
+2048 MD5:5b:2a:e0:de:ad:be:ef:de:ad:be:ef:de:ad:be:ef:79 2016-03-01 Default key <nope@ae-35.com> (RSA)
+```
+
+However you get the fingerprint, add it to `user_provision.sh`:
+
+```
+SSHKEY=5b:2a:e0:de:ad:be:ef:de:ad:be:ef:de:ad:be:ef:79
+```
+
+### bootstrapping the cluster
+
+Depending on whether machines need to be created from scratch in digital ocean also set `BOOTSTRAP` env variable and run `provision.sh` from top level directory.
 You can check if the cluster has been built before or not by verifying are no machines tagged vol-test or consul-vol-test in the Digital Ocean shared account.
 
 This will create 3 node cluster in digital ocean and a separate consul VM running a consul container.
@@ -42,11 +61,11 @@ When the script is run as part of a Jenkins run these vars have to be set:
 
 1. A unique build number which will be used in tags passed through `BUILD` ENV variable
 1. A `DO_KEY` env variable containing an API key for jenkins functional account in Digital Ocean
-1. The fingerprint of JENKINS SSH KEY which should have been previously added to DO
+1. The md5 fingerprint of the JENKINS SSH key as 'SSHKEY' which should have been previously added to DO
 1. `JENKINS_JOB` has to be set to "true"
 
 You can also optionally set the 
-`VERSION` or `CLI_VERSION` environment variables for plugin version and CLI version
+`PLUGIN_NAME`, `VERSION` or `CLI_VERSION` environment variables for plugin name, version and CLI version
 respectively.
 
 This will recreate the cluster from scratch every time which currently takes a couple of minutes.

@@ -3,16 +3,17 @@
 set +e
 declare -a ips
 
-version=${VERSION:-latest}
-cli_version=${CLI_VERSION:-0.0.5}
+plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
+version="${VERSION:-latest}"
+cli_version="${CLI_VERSION:-0.0.5}"
 kv_addr=138.68.188.68:8500
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 size=2gb
-sshkey=$JENKINS_KEY
-name_template=${tag}-${size}-${region}
-consul_vm_tag=$tag-"consul"
+sshkey="$JENKINS_KEY"
+name_template="${tag}-${size}-${region}"
+consul_vm_tag="${tag}-consul"
 
 
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
@@ -42,7 +43,7 @@ function provision_do_nodes()
         --image $image \
         --region $region \
         --size $size \
-        --ssh-keys $sshkey \
+        --ssh-keys $SSHKEY \
         --tag-name $tag \
         --format ID \
         --no-header $name)
@@ -104,7 +105,7 @@ function provision_consul() {
       --image $image \
       --region $region \
       --size 512mb \
-      --ssh-keys $sshkey \
+      --ssh-keys $SSHKEY \
       --tag-name $consul_vm_tag \
       --format ID \
       --no-header "consul-node")
@@ -157,7 +158,7 @@ function write_config()
   [[ -n "$kv_addr" ]] && http delete ${kv_addr}/v1/kv/storageos?recurse
 
 cat << EOF > test.env
-export VOLDRIVER="soegarots/plugin:${version}"
+export VOLDRIVER="${plugin_name}:${version}"
 export PLUGINOPTS="KV_ADDR=${kv_addr}"
 export CLIOPTS="-u storageos -p storageos"
 export KV_ADDR="${kv_addr}"
