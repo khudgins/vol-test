@@ -20,12 +20,13 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
     git clone https://github.com/khudgins/vol-test
     cd vol-tests
     git submodule update --recursive --remote
-```
+    ```
+- Install jq (on mac you can brew install it)
 
 ## Provisioning
 
 
-- as a standalone run of the automated tests (currently in digital ocean):
+### as a standalone run of the automated tests (currently in digital ocean):
 
 Depending on whether machines need to be created from scratch in digital ocean set `BOOTSTRAP` env variable and run `provision.sh` from top level directory.
 You can check if the cluster has been built before or not by verifying are no machines tagged vol-test or consul-vol-test in the Digital Ocean shared account.
@@ -35,7 +36,7 @@ This will create 3 node cluster in digital ocean and a separate consul VM runnin
 On subsequent runs or if you can see that VMS with tags vol-test and consul-node are 
 already created unset `BOOTSTRAP` and run `provision.sh` this will have the advantage of reusing the VMS and your tests will be quicker.
 
-- as a Jenkins run:
+### as a Jenkins run:
 
 When the script is run as part of a Jenkins run these vars have to be set:
 
@@ -47,6 +48,8 @@ When the script is run as part of a Jenkins run these vars have to be set:
 You can also optionally set the 
 `VERSION` or `CLI_VERSION` environment variables for plugin version and CLI version
 respectively.
+
+This will recreate the cluster from scratch every time which currently takes a couple of minutes.
 
 ## Running
 
@@ -89,3 +92,9 @@ bats singlenode.bats
 
 15 tests, 0 failures
 ```
+
+## Destroying the cluster
+
+Just run the './destroy.sh' script this will destroy all machines with the right tags..
+
+We assume that jenkins runs will be doing this at every run and recreating.

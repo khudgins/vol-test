@@ -57,7 +57,6 @@ function destroy_do_runners()
 
 function MAIN()
 {
-#    shutdown
     destroy_consul
     destroy_do_runners
 }
