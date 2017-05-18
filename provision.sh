@@ -9,7 +9,6 @@ cli_version="${CLI_VERSION:-0.0.5}"
 kv_addr=138.68.188.68:8500
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
-image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 size=2gb
 sshkey="$JENKINS_KEY"
 name_template="${tag}-${size}-${region}"
@@ -139,6 +138,7 @@ function provision_consul() {
 function do_auth_init()
 {
   doctl auth init <<< $DO_TOKEN
+  export image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 }
 
 function MAIN()
