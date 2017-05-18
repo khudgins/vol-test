@@ -10,7 +10,7 @@ kv_addr=138.68.188.68:8500
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 size=2gb
-sshkey="$JENKINS_KEY"
+SSHKEY="$JENKINS_KEY"
 name_template="${tag}-${size}-${region}"
 consul_vm_tag="${tag}-consul"
 
@@ -25,8 +25,8 @@ function download_storageos_cli()
   export cli_binary=storageos_linux_amd64-${cli_version}
 
   if [[ ! -f $cli_binary ]]; then
-    curl -sSL https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64 > $cli_binary
-    chmod +x $cli_binary
+    curl -sSL "https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64" > "$cli_binary"
+    chmod +x "$cli_binary"
   fi
 }
 
@@ -137,11 +137,11 @@ function provision_consul() {
 
 function do_auth_init()
 {
-  doctl auth init << TOKEN
-"$DO_TOKEN"
-TOKEN
+  echo "$DO_TOKEN" > TOKEN_FILE
+  doctl auth init < TOKEN_FILE
 
-  export image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
+  export image
+  image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 }
 
 function MAIN()
@@ -158,7 +158,7 @@ function MAIN()
 function write_config()
 {
   echo "Clearing KV state"
-  [[ -n "$kv_addr" ]] && http delete ${kv_addr}/v1/kv/storageos?recurse
+  [[ -n "$kv_addr" ]] && http delete "${kv_addr}/v1/kv/storageos?recurse"
 
 cat << EOF > test.env
 export VOLDRIVER="${plugin_name}:${version}"
