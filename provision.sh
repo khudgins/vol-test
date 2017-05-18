@@ -137,7 +137,7 @@ function provision_consul() {
 
 function do_auth_init()
 {
-  doctl auth init <<< $DO_TOKEN
+  echo $DO_TOKEN | doctl auth init
   export image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 }
 
