@@ -10,7 +10,6 @@ kv_addr=138.68.188.68:8500
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 size=2gb
-SSHKEY="$JENKINS_KEY"
 name_template="${tag}-${size}-${region}"
 consul_vm_tag="${tag}-consul"
 
