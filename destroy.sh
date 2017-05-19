@@ -1,12 +1,17 @@
 #!/bin/bash
 
-set -e -u
+set -e
 
 tag="vol-test${BUILD:+-$BUILD}"
 consul_vm_tag=$tag-"consul"
 
 . test.env
 
+
+if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
+    echo "Loading user settings overrides from user_provision.sh"
+    . ./user_provision.sh
+fi
 
 function shutdown()
 {
@@ -38,25 +43,31 @@ done
 
 function destroy_consul()
 {
-    id=$(doctl compute droplet list --tag-name $consul_vm_tag --format ID --no-header)
-    doctl compute droplet rm -f $id || true
+    id=$($doctl_auth compute droplet list --tag-name $consul_vm_tag --format ID --no-header)
+    if [[ -n "$id" ]]; then
+        echo "deleting $id"
+        $doctl_auth compute droplet rm -f $id || true
+    fi
 }
 
 function destroy_do_runners()
 {
-    ids=( $(doctl compute droplet list --tag-name $tag --format ID --no-header) )
+    ids=( $($doctl_auth compute droplet list --tag-name $tag --format ID --no-header) )
     if [[ ${#ids[@]} -eq 0 ]]; then
         echo "-- skipping"
         return
     fi
 
     for id in "${ids[@]}"; do
-        doctl compute droplet rm -f $id || true
+        echo "deleting $id"
+        $doctl_auth compute droplet rm -f $id || true
     done
 }
 
 function MAIN()
 {
+    export doctl_auth
+    doctl_auth="doctl -t $DO_TOKEN"
     destroy_consul
     destroy_do_runners
 }

@@ -32,13 +32,13 @@ function download_storageos_cli()
 
 function provision_do_nodes()
 {
-  droplets=$(doctl compute droplet list --tag-name ${tag} --format ID --no-header)
+  droplets=$($doctl_auth compute droplet list --tag-name ${tag} --format ID --no-header)
 
   if [[ -z "${droplets}" ]] || [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP  ]]; then
     echo "Creating new droplets"
-    doctl compute tag create $tag
+    $doctl_auth compute tag create $tag
     for name in ${name_template}01 ${name_template}02 ${name_template}03; do
-      id=$(doctl compute droplet create \
+      id=$($doctl_auth compute droplet create \
         --image $image \
         --region $region \
         --size $size \
@@ -51,7 +51,7 @@ function provision_do_nodes()
   else
     for droplet in $droplets; do
       echo "Rebuilding existing droplet ${droplet}"
-      doctl compute droplet-action rebuild "$droplet" --image $image
+      $doctl_auth compute droplet-action rebuild "$droplet" --image $image
     done
   fi
 
@@ -59,10 +59,10 @@ function provision_do_nodes()
 
     while [[ "$status" != "active" ]]; do
       sleep 2
-      status=$(doctl compute droplet get "$droplet" --format Status --no-header)
+      status=$($doctl_auth compute droplet get "$droplet" --format Status --no-header)
     done
 
-    ip=$(doctl compute droplet get "$droplet" --format PublicIPv4 --no-header)
+    ip=$($doctl_auth compute droplet get "$droplet" --format PublicIPv4 --no-header)
     ips+=($ip)
 
     echo "Waiting for SSH on $ip"
@@ -98,9 +98,9 @@ function provision_do_nodes()
 
 function provision_consul() {
   if [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP ]] ; then
-    doctl compute tag create $consul_vm_tag
+    $doctl_auth compute tag create $consul_vm_tag
 
-    id=$(doctl compute droplet create \
+    id=$($doctl_auth compute droplet create \
       --image $image \
       --region $region \
       --size 512mb \
@@ -109,7 +109,7 @@ function provision_consul() {
       --format ID \
       --no-header "consul-node")
 
-    ip=$(doctl compute droplet get "$id" --format PublicIPv4 --no-header)
+    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
 
     echo "Waiting for SSH on $ip"
     until nc -zw 1 "$ip" 22; do
@@ -121,11 +121,11 @@ function provision_consul() {
     ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
 
   else
-    id=$(doctl compute droplet list --format ID --no-header --tag-name $consul_vm_tag)
+    id=$($doctl_auth compute droplet list --format ID --no-header --tag-name $consul_vm_tag)
 
     ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
 
-    ip=$(doctl compute droplet get "$id" --format PublicIPv4 --no-header)
+    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
     ssh root@$ip 'docker stop consul-single-node'
     ssh root@$ip 'docker rm consul-single-node'
     ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
@@ -137,11 +137,15 @@ function provision_consul() {
 
 function do_auth_init()
 {
-  echo "$DO_TOKEN" > TOKEN_FILE
-  doctl auth init < TOKEN_FILE
+
+  # WE DO NOT MAKE USE OF DOCTL AUTH INIT but rather append the token to every request
+  # this is because in a non-interactive jenkins job, any way of passing input (Heredoc, redirection) are ignored
+  # with an 'unknown terminal' error we instead alias doctl and use the -t option everywhere
+  export doctl_auth
+  doctl_auth="doctl -t $DO_TOKEN"
 
   export image
-  image=$(doctl compute image list  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
+  image=$($doctl_auth compute image list --public  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 }
 
 function MAIN()
