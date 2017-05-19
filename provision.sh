@@ -117,7 +117,7 @@ function provision_consul() {
     sleep 5
 
     ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
-    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
+    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server --bootstrap-expect=1'
 
   else
     id=$($doctl_auth compute droplet list --format ID --no-header --tag-name $consul_vm_tag)

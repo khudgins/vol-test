@@ -64,12 +64,19 @@ function destroy_do_runners()
     done
 }
 
+function delete_tags()
+{
+    $doctl_auth compute tag delete -f $tag
+    $doctl_auth compute tag delete -f $consul_vm_tag
+}
+
 function MAIN()
 {
     export doctl_auth
     doctl_auth="doctl -t $DO_TOKEN"
     destroy_consul
     destroy_do_runners
+    delete_tags
 }
 
     MAIN
