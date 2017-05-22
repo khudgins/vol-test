@@ -18,22 +18,22 @@ load ../../test_helper
 }
 
 @test "Start a container and mount the volume on node 2" {
-  run $prefix2 docker run -it -d --name mounter -v repl-vol:/data ubuntu /bin/bash
+  run $prefix2 docker run -i -d --name mounter -v repl-vol:/data ubuntu /bin/bash
   assert_success
 }
 
 @test "Create a binary file" {
-  run $prefix2 -t docker exec -it 'mounter dd if=/dev/urandom of=/data/random bs=10M count=1'
+  run $prefix2 docker exec -i 'mounter dd if=/dev/urandom of=/data/random bs=10M count=1'
   assert_output --partial "10 M"
 }
 
 @test "Get a checksum for that binary file" {
-  run $prefix2 -t 'docker exec -it mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
+  run $prefix2 'docker exec -i mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
   assert_success
 }
 
 @test "Confirm checksum on node 2" {
-  run $prefix2 -t docker exec -it mounter md5sum --check /data/checksum
+  run $prefix2 docker exec -i mounter md5sum --check /data/checksum
   assert_success
 }
 
@@ -58,7 +58,7 @@ load ../../test_helper
 }
 
 @test "Confirm checksum on node 1" {
-  run $prefix -t docker run -it --rm -v repl-vol:/data ubuntu md5sum --check /data/checksum
+  run $prefix docker run -i --rm -v repl-vol:/data ubuntu md5sum --check /data/checksum
   assert_success
 }
 
