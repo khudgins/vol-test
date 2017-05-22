@@ -154,8 +154,8 @@ function MAIN()
   download_storageos_cli
   provision_consul
   provision_do_nodes
-  write_config
   set +x
+  write_config
 }
 
 function write_config()
@@ -174,8 +174,9 @@ export PREFIX3="ssh root@${ips[2]}"
 EOF
 
   echo "SUCCESS!  Ready to run tests:"
-  echo "  source test.env"
   echo "  ./run-volume-tests.sh"
+  echo "your environment credentials will be in test.env .. you may source it to interact with it manually"
+
 }
 
 MAIN

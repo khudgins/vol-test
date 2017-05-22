@@ -7,7 +7,6 @@ consul_vm_tag=$tag-"consul"
 
 . test.env
 
-
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
     echo "Loading user settings overrides from user_provision.sh"
     . ./user_provision.sh

@@ -11,6 +11,7 @@
 #PLUGINOPTS='PLUGIN_API_KEY="keystring goes here" PLUGIN_API_HOST="192.168.42.97"'
 #CREATEOPTS='-o profile=database'
 
+. test.env
 pushd docker-plugin
 echo "-----------------------------"
 echo "installing plugin on 3 nodes"
