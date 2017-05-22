@@ -6,7 +6,6 @@ declare -a ips
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
 version="${VERSION:-latest}"
 cli_version="${CLI_VERSION:-0.0.5}"
-kv_addr=138.68.188.68:8500
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 size=2gb
@@ -171,11 +170,12 @@ export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 export PREFIX3="ssh root@${ips[2]}"
+export DO_TAG="${tag}"
 EOF
 
   echo "SUCCESS!  Ready to run tests:"
   echo "  ./run-volume-tests.sh"
-  echo "your environment credentials will be in test.env .. you may source it to interact with it manually"
+  echo " Your environment credentials will be in test.env .. you may source it to interact with it manually"
 
 }
 

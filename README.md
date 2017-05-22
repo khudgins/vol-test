@@ -114,6 +114,8 @@ bats singlenode.bats
 
 ## Destroying the cluster
 
-Just run the './destroy.sh' script this will destroy all machines with the right tags..
+Just run the './destroy.sh' script this will destroy all machines with the right tags.. 
+
+You need to pass a build number and jenkins do token as well for appropriate jenkins cleanup
 
 We assume that jenkins runs will be doing this at every run and recreating.
