@@ -1,9 +1,14 @@
 #!/usr/bin/env bats
 
-load test_helper
+load "../test_helper"
 
 @test "Test: Install plugin for driver ($driver) on node 2" {
   #skip "This test works, faster for rev without it"
+  run $prefix -t "docker plugin ls | grep $driver"
+  if [[ $status -eq 0 ]]; then
+    skip
+  fi
+
   run $prefix2 docker plugin install --grant-all-permissions $driver $pluginopts
   sleep 60
   assert_success
@@ -15,17 +20,17 @@ load test_helper
 }
 
 @test "Start a container and mount the volume on node 2" {
-  run $prefix2 docker run -it -d --name mounter -v testvol:/data ubuntu /bin/bash
+  run $prefix2 docker run -i -d --name mounter -v testvol:/data ubuntu /bin/bash
   assert_success
 }
 
 @test "Confirm textfile contents on the volume from node 2" {
-  run $prefix2 -t docker exec -it mounter cat /data/foo.txt
+  run $prefix2 docker exec -i mounter cat /data/foo.txt
   assert_line --partial "testdata"
 }
 
 @test "Confirm checksum for binary file on node 2" {
-  run $prefix2 -t docker exec -it mounter md5sum --check /data/checksum
+  run $prefix2 docker exec -i mounter md5sum --check /data/checksum
   assert_success
 }
 
