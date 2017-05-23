@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load "../test_helper"
+load "../../test_helper"
 
 @test "Test: Install plugin for driver ($driver)" {
   #skip "Faster for rev during development without it - leave driver installed"

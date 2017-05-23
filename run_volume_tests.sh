@@ -16,22 +16,24 @@ pushd docker-plugin
 echo "-----------------------------"
 echo "installing plugin on 3 nodes"
 echo "-----------------------------"
+pushd ./install
+  bats -u .
+popd
 sleep 30
 echo "-----------------------------"
 echo "running docker acceptance tests"
 echo "-----------------------------"
-bats -u singlenode.bats secondnode.bats
+pushd ./docker-tests
+  bats -u .
+popd
 popd
 
-for f in acceptance-tests/**/*bats ; do
-  TESTNAME=`basename $f`
-  FOLDNAME=`dirname $f`
-
+for d in acceptance-tests/** ; do
   echo "-----------------------------"
-  echo  "$TESTNAME tests in suite $FOLDNAME"
+  echo  "$d bats suite running"
   echo "-----------------------------"
-  pushd $FOLDNAME
-  bats -u $TESTNAME
+  pushd $d
+   bats -u .
   popd
 done
 

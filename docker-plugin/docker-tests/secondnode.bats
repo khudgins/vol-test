@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load "../test_helper"
+load "../../test_helper"
 
 @test "Test: Install plugin for driver ($driver) on node 2" {
   #skip "This test works, faster for rev without it"
