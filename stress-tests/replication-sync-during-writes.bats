@@ -24,19 +24,31 @@ export NAMESPACE=test
   # wait a little just to ensure operation is in progress..
   sleep 2
 # Add replication
-  run $prefix2 storageos $cliopts volume update --label-add 'storageos.feature.replication=2' default/stress-sync
+  run $prefix2 storageos $cliopts volume update --label-add 'storageos.feature.replicas=2' default/stress-sync
   assert_success
 }
 
-# @test "Wait for replication, Get a checksum for that binary file" {
-#   run $prefix2 -t 'docker exec -it mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
-#   assert_success
-# }
+@test "Wait for replication, Get a checksum for that binary file" {
+  set -x
+  ACTIVE=`$prefix2 storageos volume inspect default/stress-sync | jq 'first.replicas + [first.master] | map(.status == "active") | all'`
+  if [[ "$ACTIVE" == "true" ]]; then
+    fail
+  fi
+  while ! [[ "$ACTIVE"  == "true" ]]; do
+    ACTIVE=`"$prefix2" storageos volume inspect default/stress-sync | jq 'first.replicas + [first.master] | map(.status == "active") | all'`
+    sleep 2
+    fail "value of ${ACTIVE}"
+  done
 
-# # @test "Confirm checksum on node 2" {
-# #   run $prefix2 -t docker exec -it mounter md5sum --check /data/checksum
-# #   assert_success
-# # }
+  run $prefix2 -t 'docker exec -it mounter /bin/bash -c "md5sum /data/random > /data/checksum"'
+  assert_success
+  set +x;
+}
+
+@test "Confirm checksum on node 2" {
+  run $prefix2 -t docker exec -it mounter md5sum --check /data/checksum
+  assert_success
+}
 
 @test "Stop container on node 2" {
   run $prefix2 docker stop mounter
