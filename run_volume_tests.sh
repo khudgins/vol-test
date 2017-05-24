@@ -24,7 +24,8 @@ echo "-----------------------------"
 echo "running docker acceptance tests"
 echo "-----------------------------"
 pushd ./docker-tests
-  bats -u .
+# these docker provided tests have to be done in order
+  bats -u singlenode.bats secondnode.bats
 popd
 popd
 
