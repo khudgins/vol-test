@@ -1,6 +1,6 @@
 #!/bin/bash
 
-storage_version=alpha
+storage_version=0.7.9
 
 cli_version=0.0.4
 cli_binary=/usr/local/bin/storageos
@@ -17,6 +17,8 @@ sudo modprobe nbd nbds_max=1024
 docker rm -f storageos
 docker run -d --name storageos \
 	-e HOSTNAME \
+	-e ADMIN_USERNAME=new-user \
+	-e ADMIN_PASSWORD=new-pass \
 	--net=host \
 	--pid=host \
 	--privileged \
@@ -25,3 +27,5 @@ docker run -d --name storageos \
 	-v /var/lib/storageos:/var/lib/storageos:rshared \
 	-v /run/docker/plugins:/run/docker/plugins \
 	storageos/node:$storage_version server
+
+
