@@ -4,7 +4,7 @@ metadata:
   labels:
     name: redis
     role: master
-  name: test-storageos-redis
+  name: test-storageos-redis-bad
 spec:
   containers:
     - name: master
@@ -25,7 +25,7 @@ spec:
       storageos:
         # This volume must already exist within StorageOS
         volumeName: redis-vol01
-        secretName: storageos-secret
+        secretName: storageos-bad-secret
         # volumeNamespace is optional, and specifies the volume scope within
         # StorageOS.  If no namespace is provided, it will use the namespace
         # of the pod.  Set to `default` or leave blank if you are not using
@@ -33,4 +33,3 @@ spec:
         volumeNamespace: default
         # The filesystem type to create on the volume, if required.
         fsType: ext4
-        secretName: storageos-secret

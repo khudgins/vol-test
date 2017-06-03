@@ -44,23 +44,23 @@ load test_helper
   assert_line --partial "pod \"test-storageos-redis-pvc\" created"
 }
 
-#@test "Describe pod" {
-#  sleep 20
-#  run $kubectl describe pod test-storageos-redis-pvc
-#  assert_line --partial "/redis-master-data from redis-data (rw)"
-#  assert_line --partial "Ready:		True"
-#}
-#
-#@test "Delete pod, pv and pvc" {
-#  run $kubectl delete pod test-storageos-redis-pvc
-#  assert_line --partial "pod \"test-storageos-redis-pvc\" deleted"
-#  run $kubectl delete pvc pvc0001
-#  assert_line --partial "persistentvolumeclaim \"pvc0001\" deleted"
-#  run $kubectl delete pv pv0001
-#  assert_line --partial "persistentvolume \"pv0001\" deleted"
-#}
-#
-#@test "Delete volume using storageos cli" {
-#  run storageos $cliopts volume rm -f default/pv0001
-#  assert_success
-#}
+@test "Describe pod" {
+  sleep 20
+  run $kubectl describe pod test-storageos-redis-pvc
+  assert_line --partial "/redis-master-data from redis-data (rw)"
+  assert_line --partial "Ready:		True"
+}
+
+# @test "Delete pod, pv and pvc" {
+#   run $kubectl delete pod test-storageos-redis-pvc
+#   assert_line --partial "pod \"test-storageos-redis-pvc\" deleted"
+#   run $kubectl delete pvc pvc0001
+#   assert_line --partial "persistentvolumeclaim \"pvc0001\" deleted"
+#   run $kubectl delete pv pv0001
+#   assert_line --partial "persistentvolume \"pv0001\" deleted"
+# }
+
+# @test "Delete volume using storageos cli" {
+#   run storageos $cliopts volume rm -f default/pv0001
+#   assert_success
+# }
