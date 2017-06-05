@@ -5,9 +5,9 @@ metadata:
   labels:
     environment: test
 spec:
+  storageClassName: fast
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
-  storageClassName: fast

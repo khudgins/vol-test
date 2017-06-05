@@ -8,14 +8,14 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
-#  storageClassName: fast
+  storageClassName: fast
   storageos:
     # This volume must already exist within StorageOS
     volumeName: pv0001
     # volumeNamespace is optional, and specifies the volume scope within
     # StorageOS.  Set to `default` or leave blank if you are not using
     # namespaces.
-    secretName: storageos-secret
-    #volumeNamespace: default
+    volumeNamespace: default
     # The filesystem type to create on the volume, if required.
     fsType: ext4
+    secretName: storageos-secret
