@@ -14,19 +14,18 @@ load ../test_helper
 
 
 @test "Create pv" {
-  run $kubectl create -f bad-examples/storageos-pv.yaml
+  run $kubectl create -f "$BATS_TEST_DIRNAME/bad-examples/storageos-pv.yaml"
   assert_output 'persistentvolume "pv0001-bad" created'
 }
 
-@test "Ensure pv is not available" {
+@test "Ensure pv is available" {
   run $kubectl describe pv pv0001-bad
   echo $output | grep "Available"
-  refute
+  assert_success
 }
 
-#
 @test "Create pvc" {
-  run $kubectl create -f bad-examples/storageos-pvc.yaml
+  run $kubectl create -f "$BATS_TEST_DIRNAME/bad-examples/storageos-pvc.yaml"
   assert_output 'persistentvolumeclaim "pvc0001-bad" created'
   sleep 5
 }
@@ -42,23 +41,21 @@ load ../test_helper
 }
 
 @test "Create pod using pvc" {
-  run $kubectl create -f bad-examples/storageos-pvcpod.yaml
+  run $kubectl create -f "$BATS_TEST_DIRNAME/bad-examples/storageos-pvcpod.yaml"
   assert_line --partial "pod \"test-storageos-redis-pvc-bad\" created"
 }
 
-@test "Describe pod" {
-  sleep 20
-  run $kubectl describe pod test-storageos-redis-pvc-bad
-  assert_line --partial "/redis-master-data from redis-data (rw)"
-  assert_line --partial "Ready:		True"
+@test "Verify pod was not autorized to mount" {
+  run bash -c "$kubectl describe pod test-storageos-redis-pvc-bad | grep -e Unauthorized -e FailedMount"
+  assert_success
 }
 
 @test "Delete pod, pv and pvc" {
   run $kubectl delete pod test-storageos-redis-pvc-bad
   assert_line --partial "pod \"test-storageos-redis-pvc-bad\" deleted"
-  run $kubectl delete pvc pvc0001
+  run $kubectl delete pvc pvc0001-bad
   assert_line --partial "persistentvolumeclaim \"pvc0001-bad\" deleted"
-  run $kubectl delete pv pv0001
+  run $kubectl delete pv pv0001-bad
   assert_line --partial "persistentvolume \"pv0001-bad\" deleted"
 }
 

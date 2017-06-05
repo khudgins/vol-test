@@ -30,6 +30,6 @@ spec:
         # StorageOS.  If no namespace is provided, it will use the namespace
         # of the pod.  Set to `default` or leave blank if you are not using
         # namespaces.
-        volumeNamespace: default
+        # volumeNamespace: default
         # The filesystem type to create on the volume, if required.
         fsType: ext4

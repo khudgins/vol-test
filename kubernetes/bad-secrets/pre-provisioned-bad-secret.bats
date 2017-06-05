@@ -13,7 +13,7 @@ load ../test_helper
 }
 
 @test "Create pod using pre-created volume" {
-  run $kubectl create -f bad-examples/bad-secrets/storageos-pod.yaml
+  run $kubectl create -f $BATS_TEST_DIRNAME/bad-examples/storageos-pod.yaml
   assert_line --partial "pod \"test-storageos-redis-bad\" created"
 }
 
@@ -22,14 +22,13 @@ load ../test_helper
   assert_success
 }
 
-@test "Verify pod is not running" {
-  run bash -c "$kubectl get pod test-storageos-redis-bad -o=json | jq -r '.status.phase'"
-  echo $output | grep 'running'
-  ![[ $? -eq 0 ]]
+@test "Verify pod was not autorized to mount" {
+  run bash -c "$kubectl describe pod test-storageos-redis-bad | grep -e Unauthorized -e FailedMount"
+  assert_success
 }
 
 @test "Delete pod" {
-  run $kubectl delete pod test-storageos-redis
+  run $kubectl delete pod test-storageos-redis-bad
   assert_line --partial "pod \"test-storageos-redis-bad\" deleted"
 }
 

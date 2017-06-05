@@ -1,7 +1,6 @@
 #!/bin/bash
 
 storage_version=latest
-ip=$(ip route get 1.2.3.4 | grep 1.2.3.4 | awk '{print $NF; exit}')
 
 cli_version=0.0.4
 cli_binary=/usr/local/bin/storageos
@@ -20,7 +19,6 @@ docker run -d --name storageos \
 	-e HOSTNAME \
 	-e ADMIN_USERNAME=new-user \
 	-e ADMIN_PASSWORD=new-pass \
-	-e ADVERTISE_IP=${ip} \
 	--net=host \
 	--pid=host \
 	--privileged \

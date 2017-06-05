@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pvc0001-bad
+  name: pv0001-bad
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Recycle
-  storageClassName: fast
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: fast-bad
   storageos:
     # This volume must already exist within StorageOS
     volumeName: pv0001-bad
