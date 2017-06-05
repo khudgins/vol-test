@@ -260,7 +260,7 @@ StorageOS supports the following storage class parameters:
 
    ```yaml
    kind: StorageClass
-   apiVersion: storage.k8s.io/v1beta1
+   apiVersion: storage.k8s.io/v1
    metadata:
      name: fast
    provisioner: kubernetes.io/storageos
@@ -300,7 +300,7 @@ StorageOS supports the following storage class parameters:
    metadata:
      name: fast0001
      annotations:
-       volume.beta.kubernetes.io/storage-class: fast
+       storageClassName: fast
    spec:
      accessModes:
        - ReadWriteOnce

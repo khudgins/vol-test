@@ -5,9 +5,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 load "$DIR/../test/test_helper/bats-support/load.bash"
 load "$DIR/../test/test_helper/bats-assert/load.bash"
 
-cliopts="-u new-user -p new-pass"
+cliopts="-u storageos -p storageos"
 
-kubectl="/home/houssem/code/kubernetes/cluster/kubectl.sh"
+kubectl="/home/simon/pr/src/k8s.io/kubernetes/cluster/kubectl.sh"
 jq="/usr/bin/jq"
 
 export KUBERNETES_PROVIDER=local

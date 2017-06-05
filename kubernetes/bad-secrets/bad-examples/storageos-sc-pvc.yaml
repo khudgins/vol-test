@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: fast0001-bad
   annotations:
-    volume.beta.kubernetes.io/storage-class: fast-bad
+    storageClassName: fast-bad
 spec:
   accessModes:
     - ReadWriteOnce

@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: fast
+#  storageClassName: fast
   storageos:
     # This volume must already exist within StorageOS
     volumeName: pv0001

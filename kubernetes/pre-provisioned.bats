@@ -27,12 +27,12 @@ load test_helper
   assert_line "Running"
 }
 
-@test "Delete pod" {
-  run $kubectl delete pod test-storageos-redis
-  assert_line --partial "pod \"test-storageos-redis\" deleted"
-}
-
-@test "Delete volume using storageos cli" {
-  run storageos $cliopts volume rm -f default/redis-vol01
-  assert_success
-}
+#@test "Delete pod" {
+#  run $kubectl delete pod test-storageos-redis
+#  assert_line --partial "pod \"test-storageos-redis\" deleted"
+#}
+#
+#@test "Delete volume using storageos cli" {
+#  run storageos $cliopts volume rm -f default/redis-vol01
+#  assert_success
+#}

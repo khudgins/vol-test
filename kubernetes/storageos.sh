@@ -1,6 +1,6 @@
 #!/bin/bash
 
-storage_version=0.7.9
+storage_version=latest
 
 cli_version=0.0.4
 cli_binary=/usr/local/bin/storageos
