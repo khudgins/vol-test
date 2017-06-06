@@ -9,7 +9,7 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
 - Install BATS.
 
     ```
-    git clone https://github.com/sstephenson/bats.git
+    git clone https://github.com/calj/bats.git
     cd bats
     sudo ./install.sh /usr/local
     ```
@@ -17,7 +17,7 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
 - Clone this repository (optionally, fork), and pull submodules
 
     ```
-    git clone https://github.com/khudgins/vol-test
+    git clone https://github.com/croomes/vol-test
     cd vol-tests
     git submodule update --recursive --remote
     ```
