@@ -23,6 +23,12 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
     ```
 - Install jq (on mac you can brew install it)
 
+- Install doctl :
+```
+wget -qO- https://github.com/digitalocean/doctl/releases/download/v1.6.1/doctl-1.6.1-linux-amd64.tar.gz  | tar xz
+sudo mv ./doctl /usr/local/bin
+```
+
 ## Provisioning
 
 
