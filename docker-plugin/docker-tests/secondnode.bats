@@ -50,6 +50,7 @@ load "../../test_helper"
 }
 
 @test "Confirm volume is removed from docker ls" {
+  sleep 10
   run $prefix2 docker volume ls
   refute_output --partial 'testvol'
 }
