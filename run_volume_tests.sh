@@ -11,13 +11,17 @@
 #PLUGINOPTS='PLUGIN_API_KEY="keystring goes here" PLUGIN_API_HOST="192.168.42.97"'
 #CREATEOPTS='-o profile=database'
 
+if ! [[ -f user_provision.sh ]]; then
+  BATS_OPTS='-u'
+fi
+
 . test.env
 pushd docker-plugin
 echo "-----------------------------"
 echo "installing plugin on 3 nodes"
 echo "-----------------------------"
 pushd ./install
-  bats -u .
+  bats $BATS_OPTS .
 popd
 sleep 30
 echo "-----------------------------"
@@ -25,7 +29,7 @@ echo "running docker acceptance tests"
 echo "-----------------------------"
 pushd ./docker-tests
 # these docker provided tests have to be done in order
-  bats -u singlenode.bats secondnode.bats
+  bats $BATS_OPTS singlenode.bats secondnode.bats
 popd
 popd
 
@@ -34,7 +38,7 @@ for d in acceptance-tests/** ; do
   echo  "$d bats suite running"
   echo "-----------------------------"
   pushd $d
-   bats -u .
+   bats $BATS_OPTS .
   popd
 done
 

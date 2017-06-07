@@ -5,7 +5,7 @@ set -e
 tag="vol-test${BUILD:+-$BUILD}"
 consul_vm_tag=$tag-"consul"
 
-. test.env
+. test.env || true
 
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
     echo "Loading user settings overrides from user_provision.sh"

@@ -51,6 +51,10 @@ However you get the fingerprint, add it to `user_provision.sh`:
 SSHKEY=5b:2a:e0:de:ad:be:ef:de:ad:be:ef:de:ad:be:ef:79
 ```
 
+### DO Key
+
+Add a valid do api key in `user_provision.sh` as `DO_TOKEN=X`
+
 ### bootstrapping the cluster
 
 Depending on whether machines need to be created from scratch in digital ocean also set `BOOTSTRAP` env variable and run `provision.sh` from top level directory.
@@ -66,7 +70,7 @@ already created unset `BOOTSTRAP` and run `provision.sh` this will have the adva
 When the script is run as part of a Jenkins run these vars have to be set:
 
 1. A unique build number which will be used in tags passed through `BUILD` ENV variable
-1. A `DO_KEY` env variable containing an API key for jenkins functional account in Digital Ocean
+1. A `DO_TOKEN` env variable containing an API key for jenkins functional account in Digital Ocean
 1. The md5 fingerprint of the JENKINS SSH key as 'SSHKEY' which should have been previously added to DO
 1. `JENKINS_JOB` has to be set to "true"
 

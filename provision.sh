@@ -121,9 +121,9 @@ function provision_consul() {
   else
     id=$($doctl_auth compute droplet list --format ID --no-header --tag-name $consul_vm_tag)
 
+    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
     ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
 
-    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
     ssh root@$ip 'docker stop consul-single-node'
     ssh root@$ip 'docker rm consul-single-node'
     ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
@@ -140,6 +140,12 @@ function do_auth_init()
   # this is because in a non-interactive jenkins job, any way of passing input (Heredoc, redirection) are ignored
   # with an 'unknown terminal' error we instead alias doctl and use the -t option everywhere
   export doctl_auth
+
+  if [[ -z $DO_TOKEN ]] ; then
+    echo "please ensure that your DO_TOKEN is entered in user_provision.sh"
+    exit 1
+  fi
+
   doctl_auth="doctl -t $DO_TOKEN"
 
   export image
