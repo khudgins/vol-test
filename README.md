@@ -1,6 +1,6 @@
 ## Introduction
 
-vol-test is a set of integration tests that is intended to prove and test API support of volume plugins for Docker. vol-test is based upon BATS(https://github.com/sstephenson/bats.git) and depends on some helper libraries - bats-support and bats-assert which are linked as submodules.
+vol-test is a set of system (end-to-end) tests that is intended to prove and test API support of volume plugins for Docker. vol-test is based upon BATS(https://github.com/sstephenson/bats.git) and depends on some helper libraries - bats-support and bats-assert which are linked as submodules.
 
 vol-test supports testing against remote environments. Remote Docker hosts should have ssh keys configured for access without a password.
 
