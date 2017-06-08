@@ -15,7 +15,9 @@ spec:
     # volumeNamespace is optional, and specifies the volume scope within
     # StorageOS.  Set to `default` or leave blank if you are not using
     # namespaces.
-    secretName: storageos-bad-secret
+    secretRef:
+      name: storageos-bad-secret
+      namespace: storageos
     #volumeNamespace: default
     # The filesystem type to create on the volume, if required.
     fsType: ext4

@@ -18,4 +18,5 @@ spec:
     volumeNamespace: default
     # The filesystem type to create on the volume, if required.
     fsType: ext4
-    secretName: storageos-secret
+    secretRef:
+      name: storageos-secret

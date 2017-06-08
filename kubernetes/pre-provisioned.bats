@@ -32,6 +32,11 @@ load test_helper
   assert_line --partial "pod \"test-storageos-redis\" deleted"
 }
 
+@test "Secret is in  different namespace" {
+  run $kubectl create -f examples/storageos-ns-pod.yaml
+  assert_line --partial "pod \"test-storageos-redis\" created"
+}
+
 @test "Delete volume using storageos cli" {
   run storageos $cliopts volume rm -f default/redis-vol01
   assert_success

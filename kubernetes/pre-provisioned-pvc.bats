@@ -60,7 +60,11 @@ load test_helper
   assert_line --partial "persistentvolume \"pv0001\" deleted"
 }
 
-@test "Delete volume using storageos cli" {
-  run storageos $cliopts volume rm -f default/pv0001
-  assert_success
+@test "using secret from different namespace" {
+  
 }
+
+# @test "Delete volume using storageos cli" {
+#   run storageos $cliopts volume rm -f default/pv0001
+#   assert_success
+# }

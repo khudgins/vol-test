@@ -5,6 +5,7 @@ metadata:
 provisioner: kubernetes.io/storageos
 parameters:
   pool: default
-  secretName: storageos-bad-secret
+  secretRef:
+    name: storageos-bad-secret
   description: Kubernetes volume
   fsType: ext4
