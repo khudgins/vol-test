@@ -6,6 +6,6 @@ provisioner: kubernetes.io/storageos
 parameters:
   pool: default
   adminSecretName: storageos-secret
-  adminSecretNamespace: storageos
+  adminSecretNamespace: alternative-sc
   description: Kubernetes volume
   fsType: ext4
