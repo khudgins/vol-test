@@ -3,109 +3,186 @@
 set +e
 declare -a ips
 
-version=0.7.7
-cli_version=0.0.4
-kv_addr=138.68.188.68:8500
-tag=vol-test
+plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
+version="${VERSION:-latest}"
+cli_version="${CLI_VERSION:-0.0.5}"
+tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
-image=24232340  # Docker on Ubuntu 16.04 64-bit
 size=2gb
-sshkey=b6:8a:f7:fe:8f:9c:b4:61:b3:f2:3c:d7:65:8a:70:1d
-name_template=${tag}-${size}-${region}
+name_template="${tag}-${size}-${region}"
+consul_vm_tag="${tag}-consul"
 
-if [ -f user_provision.sh ]; then
+
+if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
     echo "Loading user settings overrides from user_provision.sh"
     . ./user_provision.sh
 fi
 
-cli_binary=storageos_linux_amd64-${cli_version}
-if [ ! -f $cli_binary ]; then
-  curl -sSL https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64 > $cli_binary
-  chmod +x $cli_binary
-fi
+function download_storageos_cli()
+{
+  export cli_binary=storageos_linux_amd64-${cli_version}
 
-droplets=$(doctl compute droplet list --tag-name ${tag} --format ID --no-header)
+  if [[ ! -f $cli_binary ]]; then
+    curl -sSL "https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64" > "$cli_binary"
+    chmod +x "$cli_binary"
+  fi
+}
 
-if [ -z "${droplets}" ]; then
-  echo "Creating new droplets"
-  doctl compute tag create $tag
-  for name in ${name_template}01 ${name_template}02 ${name_template}03; do
-    id=$(doctl compute droplet create \
+function provision_do_nodes()
+{
+  droplets=$($doctl_auth compute droplet list --tag-name ${tag} --format ID --no-header)
+
+  if [[ -z "${droplets}" ]] || [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP  ]]; then
+    echo "Creating new droplets"
+    $doctl_auth compute tag create $tag
+    for name in ${name_template}01 ${name_template}02 ${name_template}03; do
+      id=$($doctl_auth compute droplet create \
+        --image $image \
+        --region $region \
+        --size $size \
+        --ssh-keys $SSHKEY \
+        --tag-name $tag \
+        --format ID \
+        --no-header $name)
+      droplets+=" ${id}"
+    done
+  else
+    for droplet in $droplets; do
+      echo "Rebuilding existing droplet ${droplet}"
+      $doctl_auth compute droplet-action rebuild "$droplet" --image $image
+    done
+  fi
+
+  for droplet in $droplets; do
+
+    while [[ "$status" != "active" ]]; do
+      sleep 2
+      status=$($doctl_auth compute droplet get "$droplet" --format Status --no-header)
+    done
+
+    ip=$($doctl_auth compute droplet get "$droplet" --format PublicIPv4 --no-header)
+    ips+=($ip)
+
+    echo "Waiting for SSH on $ip"
+    until nc -zw 1 "$ip" 22; do
+      sleep 2
+    done
+    sleep 5
+
+    ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts
+    echo "Disabling firewall"
+    until ssh "root@${ip}" "/usr/sbin/ufw disable"; do
+      sleep 2
+    done
+
+    echo "Enabling core dumps"
+    ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
+    ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqqy install systemd-coredump"
+
+    echo "Copying StorageOS CLI"
+    scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
+    ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
+    ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
+
+    echo "Setting up for core dumps"
+    ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
+    ssh root@${ip} "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqy install systemd-coredump"
+
+    echo "Enable NBD"
+    ssh root@${ip} "modprobe nbd nbds_max=1024"
+  done
+}
+
+
+function provision_consul() {
+  if [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP ]] ; then
+    $doctl_auth compute tag create $consul_vm_tag
+
+    id=$($doctl_auth compute droplet create \
       --image $image \
       --region $region \
-      --size $size \
-      --ssh-keys $sshkey \
-      --tag-name $tag \
+      --size 512mb \
+      --ssh-keys $SSHKEY \
+      --tag-name $consul_vm_tag \
       --format ID \
-      --no-header $name)
-    droplets+=" ${id}"
-  done
-else
-  for droplet in $droplets; do
-    echo "Rebuilding existing droplet ${droplet}"
-    doctl compute droplet-action rebuild "$droplet" --image $image
-  done
-fi
+      --no-header "consul-node")
 
-for droplet in $droplets; do
+    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
 
-  while [ "$status" != "active" ]; do
-    sleep 2
-    status=$(doctl compute droplet get "$droplet" --format Status --no-header)
-  done
+    echo "Waiting for SSH on $ip"
+    until nc -zw 1 "$ip" 22; do
+      sleep 2
+    done
+    sleep 5
 
-  ip=$(doctl compute droplet get "$droplet" --format PublicIPv4 --no-header)
-  ips+=($ip)
+    ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
+    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server --bootstrap-expect=1'
 
-  echo "Waiting for SSH on $ip"
-  until nc -zw 1 "$ip" 22; do
-    sleep 2
-  done
-  sleep 5
+  else
+    id=$($doctl_auth compute droplet list --format ID --no-header --tag-name $consul_vm_tag)
 
-  ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts
-  echo "Disabling firewall"
-  until ssh "root@${ip}" "/usr/sbin/ufw disable"; do
-    sleep 2
-  done
+    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
+    ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
 
-  echo "Copying ~/.docker/config.json (auth needed for private beta)"
-  ssh "root@${ip}" "mkdir /root/.docker 2>/dev/null"
-  scp ~/.docker/config.json "root@${ip}:/root/.docker/"
+    ssh root@$ip 'docker stop consul-single-node'
+    ssh root@$ip 'docker rm consul-single-node'
+    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
+  fi
 
-  echo "Enabling core dumps"
-  ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-  ssh "root@${ip}" "env DEBIAN_FRONTEND=noninteractive apt-get -qqqy install systemd-coredump"
+  kv_addr="$ip:8500"
 
-  echo "Copying StorageOS CLI"
-  scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
-  ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
-  ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
+}
 
-  echo "Setting up for core dumps"
-  ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-  ssh root@${ip} "env DEBIAN_FRONTEND=noninteractive apt-get -qqy install systemd-coredump"
+function do_auth_init()
+{
 
-  echo "Enable NBD"
-  ssh root@${ip} "modprobe nbd nbds_max=1024"
-done
+  # WE DO NOT MAKE USE OF DOCTL AUTH INIT but rather append the token to every request
+  # this is because in a non-interactive jenkins job, any way of passing input (Heredoc, redirection) are ignored
+  # with an 'unknown terminal' error we instead alias doctl and use the -t option everywhere
+  export doctl_auth
 
-echo "Clearing KV state"
-[ -n "$kv_addr" ] && http delete ${kv_addr}/v1/kv/storageos?recurse
+  if [[ -z $DO_TOKEN ]] ; then
+    echo "please ensure that your DO_TOKEN is entered in user_provision.sh"
+    exit 1
+  fi
+
+  doctl_auth="doctl -t $DO_TOKEN"
+
+  export image
+  image=$($doctl_auth compute image list --public  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
+}
+
+function MAIN()
+{
+  set -x
+  do_auth_init
+  download_storageos_cli
+  provision_consul
+  provision_do_nodes
+  set +x
+  write_config
+}
+
+function write_config()
+{
+  echo "Clearing KV state"
+  [[ -n "$kv_addr" ]] && [[ -z "JENKINS_JOB" ]] && http delete "${kv_addr}/v1/kv/storageos?recurse"
 
 cat << EOF > test.env
-export VOLDRIVER="storageos/plugin:${version}"
+export VOLDRIVER="${plugin_name}:${version}"
 export PLUGINOPTS="KV_ADDR=${kv_addr}"
 export CLIOPTS="-u storageos -p storageos"
 export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 export PREFIX3="ssh root@${ips[2]}"
+export DO_TAG="${tag}"
 EOF
 
-echo
-echo "SUCCESS!  Ready to run tests:"
-echo "  source test.env"
-echo "  bats singlenode.bats"
-echo "  bats secondnode.bats"
-echo
+  echo "SUCCESS!  Ready to run tests:"
+  echo "  ./run-volume-tests.sh"
+  echo " Your environment credentials will be in test.env .. you may source it to interact with it manually"
+
+}
+
+MAIN

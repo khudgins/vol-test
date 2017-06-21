@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load test_helper
+load "../../test_helper"
 
 # Basic
 @test "Create volume using storageos cli" {
@@ -30,17 +30,17 @@ load test_helper
 }
 
 @test "Start a container and mount the volume" {
-  run $prefix docker run -it -d --name mounter -v clivol:/data ubuntu /bin/bash
+  run $prefix docker run -i -d --name mounter -v clivol:/data ubuntu /bin/bash
   assert_success
 }
 
 @test "Write a textfile to the volume" {
-  run $prefix -t 'docker exec -it mounter /bin/bash -c "echo \"testdata\" > /data/foo.txt"'
+  run $prefix 'docker exec -i -d mounter /bin/bash -c "echo \"testdata\" > /data/foo.txt"'
   assert_success
 }
 
 @test "Confirm textfile contents on the volume" {
-  run $prefix -t docker exec -it mounter cat /data/foo.txt
+  run $prefix docker exec -i mounter cat /data/foo.txt
   assert_line --partial "testdata"
 }
 
