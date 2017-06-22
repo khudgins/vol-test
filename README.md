@@ -129,3 +129,6 @@ Just run the './destroy.sh' script this will destroy all machines with the right
 You need to pass a build number and jenkins do token as well for appropriate jenkins cleanup
 
 We assume that jenkins runs will be doing this at every run and recreating.
+
+
+NOTE: Kubernetes tests have been moved to : code.storageos.net:7999/kube/k8s-e2e-tests
