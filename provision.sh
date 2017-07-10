@@ -60,6 +60,7 @@ function provision_do_nodes()
       status=$($doctl_auth compute droplet get "$droplet" --format Status --no-header)
     done
 
+    sleep 5
     ip=$($doctl_auth compute droplet get "$droplet" --format PublicIPv4 --no-header)
     ips+=($ip)
 
@@ -107,6 +108,7 @@ function provision_consul() {
       --format ID \
       --no-header "consul-node")
 
+    sleep 5
     ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
 
     echo "Waiting for SSH on $ip"
@@ -152,17 +154,6 @@ function do_auth_init()
   image=$($doctl_auth compute image list --public  | grep docker-16-04 | awk '{ print $1 }') # ubuntu on linux img
 }
 
-function MAIN()
-{
-  set -x
-  do_auth_init
-  download_storageos_cli
-  provision_consul
-  provision_do_nodes
-  set +x
-  write_config
-}
-
 function write_config()
 {
   echo "Clearing KV state"
@@ -184,5 +175,17 @@ EOF
   echo " Your environment credentials will be in test.env .. you may source it to interact with it manually"
 
 }
+
+function MAIN()
+{
+  set -x
+  do_auth_init
+  download_storageos_cli
+  provision_consul
+  provision_do_nodes
+  set +x
+  write_config
+}
+
 
 MAIN

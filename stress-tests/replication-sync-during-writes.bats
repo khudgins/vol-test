@@ -39,37 +39,37 @@ export NAMESPACE=test
   assert_success
 }
 
-# @test "Stop container on node 2" {
-#   run $prefix2 docker stop mounter
-#   assert_success
-# }
+@test "Stop container on node 2" {
+  run $prefix2 docker stop mounter
+  assert_success
+}
 
-# @test "Destroy container on node 2" {
-#   run $prefix2 docker rm mounter
-#   assert_success
-# }
+@test "Destroy container on node 2" {
+  run $prefix2 docker rm mounter
+  assert_success
+}
 
-# @test "Stop storageos on node 2" {
-#   run $prefix2 docker plugin disable -f $driver
-#   assert_success
-# }
+@test "Stop storageos on node 2" {
+  run $prefix2 docker plugin disable -f $driver
+  assert_success
+}
 
-# @test "Confirm checksum on node 1" {
-#   run $prefix docker run -i --rm -v stess-sync:/data ubuntu md5sum --check /data/checksum
-#   assert_success
-# }
+@test "Confirm checksum on node 1" {
+  run $prefix docker run -i --rm -v stess-sync:/data ubuntu md5sum --check /data/checksum
+  assert_success
+}
 
-# @test "Re-start storageos on node 2" {
-#   run $prefix2 docker plugin enable $driver
-#   assert_success
-# }
+@test "Re-start storageos on node 2" {
+  run $prefix2 docker plugin enable $driver
+  assert_success
+}
 
-# @test "wait for 60 seconds" {
-#   sleep 60
-#   assert_success
-# }
+@test "wait for 60 seconds" {
+  sleep 60
+  assert_success
+}
 
-# @test "Delete volume using storageos cli" {
-#   run $prefix storageos $cliopts volume rm default/stress-sync
-#   assert_success
-# }
+@test "Delete volume using storageos cli" {
+  run $prefix storageos $cliopts volume rm default/stress-sync
+  assert_success
+}
