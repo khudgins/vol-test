@@ -10,7 +10,6 @@ tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 size=2gb
 name_template="${tag}-${size}-${region}"
-consul_vm_tag="${tag}-consul"
 
 
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
@@ -94,47 +93,6 @@ function provision_do_nodes()
   done
 }
 
-
-function provision_consul() {
-  if [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP ]] ; then
-    $doctl_auth compute tag create $consul_vm_tag
-
-    id=$($doctl_auth compute droplet create \
-      --image $image \
-      --region $region \
-      --size 512mb \
-      --ssh-keys $SSHKEY \
-      --tag-name $consul_vm_tag \
-      --format ID \
-      --no-header "consul-node")
-
-    sleep 5
-    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
-
-    echo "Waiting for SSH on $ip"
-    until nc -zw 1 "$ip" 22; do
-      sleep 2
-    done
-    sleep 5
-
-    ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
-    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server --bootstrap-expect=1'
-
-  else
-    id=$($doctl_auth compute droplet list --format ID --no-header --tag-name $consul_vm_tag)
-
-    ip=$($doctl_auth compute droplet get "$id" --format PublicIPv4 --no-header)
-    ssh-keyscan -t ecdsa -H "$ip" >> ~/.ssh/known_hosts
-
-    ssh root@$ip 'docker stop consul-single-node'
-    ssh root@$ip 'docker rm consul-single-node'
-    ssh root@$ip 'docker run --name consul-single-node -d -p 8500:8500 -p 8600:53/udp -h consul-node progrium/consul -server -bootstrap'
-  fi
-
-  kv_addr="$ip:8500"
-
-}
-
 function do_auth_init()
 {
 
@@ -181,7 +139,6 @@ function MAIN()
   set -x
   do_auth_init
   download_storageos_cli
-  provision_consul
   provision_do_nodes
   set +x
   write_config
