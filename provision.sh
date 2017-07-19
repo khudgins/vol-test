@@ -5,7 +5,7 @@ declare -a ips
 
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
 version="${VERSION:-latest}"
-cli_version="${CLI_VERSION:-0.0.5}"
+cli_version="${CLI_VERSION:-0.0.10}"
 tag="vol-test${BUILD:+-$BUILD}"
 region=lon1
 size=2gb
@@ -22,7 +22,7 @@ function download_storageos_cli()
   export cli_binary=storageos_linux_amd64-${cli_version}
 
   if [[ ! -f $cli_binary ]]; then
-    curl -sSL "https://github.com/storageos/go-cli/releases/download/v${cli_version}/storageos_linux_amd64" > "$cli_binary"
+    curl -sSL "https://github.com/storageos/go-cli/releases/download/${cli_version}/storageos_linux_amd64" > "$cli_binary"
     chmod +x "$cli_binary"
   fi
 }
@@ -127,7 +127,6 @@ function write_config()
 
 cat << EOF > test.env
 export VOLDRIVER="${plugin_name}:${version}"
-export PLUGINOPTS="KV_ADDR=${kv_addr}"
 export CLIOPTS="-u storageos -p storageos"
 export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
@@ -144,12 +143,12 @@ EOF
 
 function MAIN()
 {
-  set -x
-  do_auth_init
-  download_storageos_cli
-  provision_do_nodes
-  set +x
-  write_config
+   set -x
+   do_auth_init
+   download_storageos_cli
+   provision_do_nodes
+   set +x
+   write_config
 }
 
 
