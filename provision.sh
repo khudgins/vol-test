@@ -61,12 +61,20 @@ function provision_do_nodes()
     done
 
     sleep 5
-    ip=$($doctl_auth compute droplet get "$droplet" --format PublicIPv4 --no-header)
-    ips+=($ip)
+
+    TIMEOUT=100
+    ip=''
+    until [[ -n $ip ]] || [[ $TIMEOUT -eq 0 ]]; do
+      ip=$($doctl_auth compute droplet get "$droplet" --format PublicIPv4 --no-header)
+      ips+=($ip)
+      TIMEOUT=$((--TIMEOUT))
+    done
 
     echo "Waiting for SSH on $ip"
-    until nc -zw 1 "$ip" 22; do
+    TIMEOUT=100
+    until nc -zw 1 "$ip" 22 || [[ $TIMEOUT -eq 0 ]] ; do
       sleep 2
+      TIMEOUT=$((--TIMEOUT))
     done
     sleep 5
 
