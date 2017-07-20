@@ -40,15 +40,6 @@ for h in $hosts; do
 done
 }
 
-function destroy_consul()
-{
-    id=$($doctl_auth compute droplet list --tag-name $consul_vm_tag --format ID --no-header)
-    if [[ -n "$id" ]]; then
-        echo "deleting $id"
-        $doctl_auth compute droplet rm -f $id || true
-    fi
-}
-
 function destroy_do_runners()
 {
     ids=( $($doctl_auth compute droplet list --tag-name $tag --format ID --no-header) )
@@ -66,7 +57,6 @@ function destroy_do_runners()
 function delete_tags()
 {
     $doctl_auth compute tag delete -f $tag
-    $doctl_auth compute tag delete -f $consul_vm_tag
 }
 
 function MAIN()
@@ -74,7 +64,6 @@ function MAIN()
     set -x
     export doctl_auth
     doctl_auth="doctl -t $DO_TOKEN"
-    destroy_consul
     destroy_do_runners
     delete_tags
     set +x
