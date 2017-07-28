@@ -20,7 +20,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
   fi
 
 
-  set -x
+ set -x
   run $prefix docker plugin install --grant-all-permissions $driver CLUSTER_ID=$(cat $CID_FILE)
   set +x
   assert_success
