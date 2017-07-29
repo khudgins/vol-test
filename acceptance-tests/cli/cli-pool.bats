@@ -40,11 +40,9 @@ pool_prefix="$prefix storageos $cliopts pool"
   echo $output | jq 'first.controllers | length == 2'
 }
 
-@test "create 2 replica volume in pool1_3, it should have 1/2 replicas" {
+@test "create 2 replica volume in pool1_3, it should have reject disk creation" {
   run $prefix3 storageos $cliopts volume create -n $NAMESPACE -p $POOL1_3 --label 'storageos.feature.replicas=2' "2replicavolume"
-  assert_success
-  run $prefix storageos $cliopts volume inspect $NAMESPACE/2replicavolume
-  echo $output | jq '(first.replicas | length) == 1'
+  assert_failure
 }
 
 @test "list pool" {
