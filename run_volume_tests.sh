@@ -15,7 +15,7 @@ if ! [[ -f user_provision.sh ]]; then
   BATS_OPTS='-u'
 fi
 
-. test.env
+. ./test.env
 pushd docker-plugin
 echo "-----------------------------"
 echo "installing plugin on 3 nodes"
@@ -37,8 +37,7 @@ for d in acceptance-tests/** ; do
   echo "-----------------------------"
   echo  "$d bats suite running"
   echo "-----------------------------"
-  pushd $d
+  pushd "$d"
    bats $BATS_OPTS .
   popd
 done
-
