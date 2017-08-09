@@ -18,7 +18,8 @@ vol-test supports testing against remote environments. Remote Docker hosts shoul
 
     ```
     git clone https://github.com/croomes/vol-test
-    cd vol-tests
+    cd vol-test
+    git submodule init
     git submodule update --recursive --remote
     ```
 - Install jq (on mac you can brew install it)
@@ -105,6 +106,7 @@ Example using the vieux/sshfs driver (replace `vieux/sshfs` with the name of the
 
 Prior to running tests the first time, you'll want to pull all the BATS assist submodules, as well:
 ```
+git submodule init
 git submodule update --recursive --remote
 ```
 
