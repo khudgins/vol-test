@@ -6,7 +6,10 @@ declare -a ips
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
 version="${VERSION:-latest}"
 cli_version="${CLI_VERSION:-0.0.11}"
-tag="vol-test${BUILD:+-$BUILD}"
+
+branch_env="${BRANCH_ENV:-branchnotset}"
+build_id="${branch_env}-${BUILD:-buildnotset}"
+tag="vol-test-${build_id}"
 region=lon1
 size=2gb
 name_template="${tag}-${size}-${region}"
@@ -85,16 +88,12 @@ function provision_do_nodes()
 
     echo "Enabling core dumps"
     ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-    ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqqy install systemd-coredump"
+    ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive ; apt-get -qy update ; apt-get -qqqy install systemd-coredump"
 
     echo "Copying StorageOS CLI"
     scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
     ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
     ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
-
-    echo "Setting up for core dumps"
-    ssh root@${ip} "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-    ssh root@${ip} "export DEBIAN_FRONTEND=noninteractive ; apt-get update ; apt-get -qqy install systemd-coredump"
 
     echo "Enable NBD"
     ssh root@${ip} "modprobe nbd nbds_max=1024"
@@ -123,7 +122,7 @@ function do_auth_init()
 function write_config()
 {
   echo "Clearing KV state"
-  [[ -n "$kv_addr" ]] && [[ -z "JENKINS_JOB" ]] && http delete "${kv_addr}/v1/kv/storageos?recurse"
+  [[ -n "$kv_addr" ]] && [[ -z "$JENKINS_JOB" ]] && http delete "${kv_addr}/v1/kv/storageos?recurse"
 
 cat << EOF > test.env
 export VOLDRIVER="${plugin_name}:${version}"

@@ -3,7 +3,6 @@
 set -e
 
 tag="vol-test${BUILD:+-$BUILD}"
-consul_vm_tag=$tag-"consul"
 
 . test.env || true
 
@@ -26,7 +25,7 @@ ip=$(echo $KV_ADDR | perl -ne 'print "$1\n" if m/([0-9.]+)(:\d+)?$/;')
 hosts="$hosts $ip"
 
 # Formatting OCD.
-hosts="$(echo $hosts | tr -s ':space:')"
+hosts="$(echo "$hosts" | tr -s ':space:')"
 
 echo "Hosts: $hosts"
 for h in $hosts; do
@@ -42,7 +41,7 @@ done
 
 function destroy_do_runners()
 {
-    ids=( $($doctl_auth compute droplet list --tag-name $tag --format ID --no-header) )
+    ids=( $($doctl_auth compute droplet list --tag-name "$tag" --format ID --no-header) )
     if [[ ${#ids[@]} -eq 0 ]]; then
         echo "-- skipping"
         return
@@ -50,13 +49,13 @@ function destroy_do_runners()
 
     for id in "${ids[@]}"; do
         echo "deleting $id"
-        $doctl_auth compute droplet rm -f $id || true
+        $doctl_auth compute droplet rm -f "$id" || true
     done
 }
 
 function delete_tags()
 {
-    $doctl_auth compute tag delete -f $tag
+    $doctl_auth compute tag delete -f "$tag"
 }
 
 function MAIN()
