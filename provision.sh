@@ -39,26 +39,26 @@ function download_storageos_cli()
 
 function provision_do_nodes()
 {
-  droplets=$($doctl_auth compute droplet list --tag-name ${tag} --format ID --no-header)
+  droplets=$($doctl_auth compute droplet list --tag-name "${tag}" --format ID --no-header)
 
   if [[ -z "${droplets}" ]] || [[ -n "$JENKINS_JOB" ]] || [[ -n "$BOOTSTRAP"  ]]; then
     echo "Creating new droplets"
-    $doctl_auth compute tag create $tag
+    $doctl_auth compute tag create "$tag"
     for name in ${name_template}01 ${name_template}02 ${name_template}03; do
       id=$($doctl_auth compute droplet create \
-        --image $image \
+        --image "$image" \
         --region $region \
         --size $size \
         --ssh-keys $SSHKEY \
-        --tag-name $tag \
+        --tag-name "$tag" \
         --format ID \
-        --no-header $name)
+        --no-header "$name")
       droplets+=" ${id}"
     done
   else
     for droplet in $droplets; do
       echo "Rebuilding existing droplet ${droplet}"
-      $doctl_auth compute droplet-action rebuild "$droplet" --image $image
+      $doctl_auth compute droplet-action rebuild "$droplet" --image "$image"
     done
   fi
 
@@ -79,7 +79,7 @@ function provision_do_nodes()
       TIMEOUT=$((--TIMEOUT))
     done
 
-    echo "Waiting for SSH on $ip"
+    echo "$droplet: Waiting for SSH on $ip"
     TIMEOUT=100
     until nc -zw 1 "$ip" 22 || [[ $TIMEOUT -eq 0 ]] ; do
       sleep 2
@@ -88,22 +88,22 @@ function provision_do_nodes()
     sleep 5
 
     ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts
-    echo "Disabling firewall"
+    echo "$droplet: Disabling firewall"
     until ssh "root@${ip}" "/usr/sbin/ufw disable"; do
       sleep 2
     done
 
-    echo "Enabling core dumps"
-    ssh "root@${ip}" "echo ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
-    ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive ; apt-get -qy update ; apt-get -qqqy install systemd-coredump"
+    echo "$droplet: Enabling core dumps"
+    ssh "root@${ip}" "ulimit -c unlimited >/etc/profile.d/core_ulimit.sh"
+    ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive && apt-get -qqy update && apt-get -qqy -o=Dpkg::Use-Pty=0 install systemd-coredump"
 
-    echo "Copying StorageOS CLI"
-    scp -p $cli_binary root@${ip}:/usr/local/bin/storageos
-    ssh root@${ip} "echo export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
-    ssh root@${ip} "echo export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
+    echo "$droplet: Copying StorageOS CLI"
+    scp -p "$cli_binary" r"oot@${ip}:/usr/local/bin/storageos"
+    ssh "root@${ip}" "export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
+    ssh "root@${ip}" "export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
 
-    echo "Enable NBD"
-    ssh root@${ip} "modprobe nbd nbds_max=1024"
+    echo "$droplet: Enable NBD"
+    ssh "root@${ip}" "modprobe nbd nbds_max=1024"
   done
 }
 
@@ -128,13 +128,9 @@ function do_auth_init()
 
 function write_config()
 {
-  echo "Clearing KV state"
-  [[ -n "$kv_addr" ]] && [[ -z "$JENKINS_JOB" ]] && http delete "${kv_addr}/v1/kv/storageos?recurse"
-
-cat << EOF > test.env
+  cat << EOF > test.env
 export VOLDRIVER="${plugin_name}:${version}"
 export CLIOPTS="-u storageos -p storageos"
-export KV_ADDR="${kv_addr}"
 export PREFIX="ssh root@${ips[0]}"
 export PREFIX2="ssh root@${ips[1]}"
 export PREFIX3="ssh root@${ips[2]}"
@@ -149,13 +145,12 @@ EOF
 
 function MAIN()
 {
-   set -x
+   # set -x
    do_auth_init
    download_storageos_cli
    provision_do_nodes
-   set +x
+   # set +x
    write_config
 }
-
 
 MAIN

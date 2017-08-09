@@ -60,12 +60,12 @@ function delete_tags()
 
 function MAIN()
 {
-    set -x
+    # set -x
     export doctl_auth
     doctl_auth="doctl -t $DO_TOKEN"
     destroy_do_runners
     delete_tags
-    set +x
+    # set +x
 }
 
     MAIN
