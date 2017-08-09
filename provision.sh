@@ -8,11 +8,11 @@ version="${VERSION:-latest}"
 cli_version="${CLI_VERSION:-0.0.11}"
 
 branch_env="${BRANCH_ENV:-branchnotset}"
-# Make sure branch_env has at most ten characters.
+# Make sure branch_env has at most 16 characters.
 if [ "$branch_env" = "branchnotset" ]; then
-    branch_env="$(uuidgen | cut -c1-8)"
+    branch_env="$(uuidgen | cut -c1-13)"
 else
-    branch_env="$(echo "$branch_env" | cut -c1-10)"
+    branch_env="$(echo "$branch_env" | cut -c1-16)"
 fi
 
 build_id="${branch_env}-${BUILD:-buildnotset}"
