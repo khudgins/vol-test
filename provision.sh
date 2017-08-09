@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set +e
+set -e
 declare -a ips
 
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
@@ -19,7 +19,7 @@ build_id="${branch_env}-${BUILD:-buildnotset}"
 tag="vol-test-${build_id}"
 region=lon1
 size=2gb
-name_template="${tag}-${size}-${region}"
+name_template="${tag}-${size}-${region}-"
 
 
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
@@ -41,7 +41,7 @@ function provision_do_nodes()
 {
   droplets=$($doctl_auth compute droplet list --tag-name ${tag} --format ID --no-header)
 
-  if [[ -z "${droplets}" ]] || [[ -n "$JENKINS_JOB" ]] || [[ -n $BOOTSTRAP  ]]; then
+  if [[ -z "${droplets}" ]] || [[ -n "$JENKINS_JOB" ]] || [[ -n "$BOOTSTRAP"  ]]; then
     echo "Creating new droplets"
     $doctl_auth compute tag create $tag
     for name in ${name_template}01 ${name_template}02 ${name_template}03; do

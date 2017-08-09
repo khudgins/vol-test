@@ -2,9 +2,9 @@
 
 set -e
 
-tag="vol-test${BUILD:+-$BUILD}"
-
 . test.env || true
+
+tag="${DO_TAG}"
 
 if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
     echo "Loading user settings overrides from user_provision.sh"
