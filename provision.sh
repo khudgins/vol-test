@@ -5,6 +5,7 @@ declare -a ips
 
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
 version="${VERSION:-latest}"
+cli_branch="${CLI_BRANCH:-}"
 cli_version="${CLI_VERSION:-0.0.11}"
 
 branch_env="${BRANCH_ENV:-branchnotset}"
@@ -29,11 +30,33 @@ fi
 
 function download_storageos_cli()
 {
-  export cli_binary=storageos_linux_amd64-${cli_version}
+  local build_id
 
-  if [[ ! -f $cli_binary ]]; then
-    curl -sSL "https://github.com/storageos/go-cli/releases/download/${cli_version}/storageos_linux_amd64" > "$cli_binary"
-    chmod +x "$cli_binary"
+  if [ -z "$cli_branch" ]; then
+    echo "Downloading CLI version ${cli_version}"
+    export cli_binary=storageos_linux_amd64-${cli_version}
+
+    if [[ ! -f $cli_binary ]]; then
+      curl --fail -sSL "https://github.com/storageos/go-cli/releases/download/${cli_version}/storageos_linux_amd64" > "$cli_binary"
+      chmod +x "$cli_binary"
+    fi
+  else
+    # Build the binary.
+    echo "Building CLI from source, branch ${cli_branch}"
+    export cli_binary=storageos_linux_amd64
+    rm -rf cli_build ${cli_binary}
+    # Check out the upstream repository.
+    git clone https://github.com/storageos/go-cli.git cli_build
+    pushd cli_build
+    if [ "$cli_branch" != master ]; then
+      git co -b "${cli_branch}" "${cli_branch}"
+    fi
+    docker build -t "cli_build:${cli_branch}" .
+    # Need to run a container and copy the file from it. Can't copy from the image.
+    build_id="$(docker run -d "cli_build:${cli_branch}" version)"
+    docker cp "${build_id}:/storageos" "${cli_binary}"
+    popd
+    rm -rf cli_build
   fi
 }
 
