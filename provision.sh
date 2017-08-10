@@ -52,10 +52,12 @@ function download_storageos_cli()
       git co -b "${cli_branch}" "${cli_branch}"
     fi
     docker build -t "cli_build:${cli_branch}" .
+    popd
     # Need to run a container and copy the file from it. Can't copy from the image.
     build_id="$(docker run -d "cli_build:${cli_branch}" version)"
+    echo "Copy binary out of container"
     docker cp "${build_id}:/storageos" "${cli_binary}"
-    popd
+    chmod +x "${cli_binary}"
     rm -rf cli_build
   fi
 }
@@ -121,7 +123,7 @@ function provision_do_nodes()
     ssh "root@${ip}" "export DEBIAN_FRONTEND=noninteractive && apt-get -qqy update && apt-get -qqy -o=Dpkg::Use-Pty=0 install systemd-coredump"
 
     echo "$droplet: Copying StorageOS CLI"
-    scp -p "$cli_binary" r"oot@${ip}:/usr/local/bin/storageos"
+    scp -p "$cli_binary" "root@${ip}:/usr/local/bin/storageos"
     ssh "root@${ip}" "export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
     ssh "root@${ip}" "export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
 
