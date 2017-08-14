@@ -28,6 +28,44 @@ if [[ -f user_provision.sh ]] && [[  -z "$JENKINS_JOB" ]]; then
     . ./user_provision.sh
 fi
 
+# The correct way to check out a ref from git depends on the
+# type of reference.
+function git_checkout_ref() {
+  local newref
+  newref="$1"
+  if [ -z "$newref" ]; then
+    echo "Function usage: ${FUNCNAME[0]} refspec" >&2
+    exit 1
+  fi
+
+  if git show-ref --verify "refs/tags/$newref"; then
+    # It's a tag.
+    echo "Checkout tag '$newref'"
+    git checkout -b "$newref" "$newref"
+
+  elif git show-ref --verify "refs/heads/$newref"; then
+    # It's a branch.
+    echo "Checkout branch '$newref'"
+    git checkout "$newref"
+
+  else
+    # Don't know what it is, treat as branch and accept the consequences.
+    echo "Checkout unknown ref '$newref'"
+    git checkout "$newref"
+  fi
+}
+
+# Can't use arbitrary git branch/tag names as docker tags.
+function git_branch_to_tag() {
+  local branch
+	branch="${1:-}"
+	if [ -z "$branch" ]; then
+		error "Function usage: ${FUNCNAME[0]} BRANCH"
+	fi
+	echo -n "$branch" | tr -C 'a-zA-Z0-9' '_' | tr -s '_'
+	echo
+}
+
 function download_storageos_cli()
 {
   local build_id
@@ -49,12 +87,18 @@ function download_storageos_cli()
     git clone https://github.com/storageos/go-cli.git cli_build
     pushd cli_build
     if [ "$cli_branch" != master ]; then
-      git co -b "${cli_branch}" "${cli_branch}"
+      git_checkout_ref "$cli_branch"
     fi
-    docker build -t "cli_build:${cli_branch}" .
+    # Check we know how to build this binary.
+    if [ ! -f Dockerfile ]; then
+      echo "Ref '$cli_branch' has no Dockerfile, so we don't know how to build it" >&2
+      exit 1
+    fi
+    docker_tag="$(git_branch_to_tag "$cli_branch")"
+    docker build -t "cli_build:${docker_tag}" .
     popd
     # Need to run a container and copy the file from it. Can't copy from the image.
-    build_id="$(docker run -d "cli_build:${cli_branch}" version)"
+    build_id="$(docker run -d "cli_build:${docker_tag}" version)"
     echo "Copy binary out of container"
     docker cp "${build_id}:/storageos" "${cli_binary}"
     chmod +x "${cli_binary}"
