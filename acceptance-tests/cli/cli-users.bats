@@ -2,19 +2,14 @@
 
 load ../../test_helper
 
-@test "create user" {
-# TODO: interactive password input using pexpect (already have python dep)
-#PYTHON_SCRIPT=$(cat <<EOD
-#'import pexpect;
-#child = pexpect.spawn("storageos user create awesomeUser --role user --groups foo,bar --password");
-#child.expect("Password: ");
-#child.sendline("password");
-#child.expect(pexpect.EOF)'
-#EOD
-#)
+@test "create user - bad password" {
+  # Should fail as passwords > 8 chars
+  run $prefix storageos $cliopts user create awesomeUser --password foo
+  assert_failure
+}
 
-  run $prefix storageos $cliopts user create awesomeUser --role user --groups foo,bar
-  echo $output
+@test "create user" {
+  run $prefix storageos $cliopts user create awesomeUser --role user --groups foo,bar --password foobar123
   assert_success
 
   run $prefix storageos $cliopts user inspect awesomeUser
@@ -45,17 +40,7 @@ load ../../test_helper
 }
 
 @test "create admin" {
-# TODO: interactive password input using pexpect (already have python dep)
-#PYTHON_SCRIPT=$(cat <<EOD
-#'import pexpect;
-#child = pexpect.spawn("storageos user create awesomeUser --role user --groups foo,bar --password");
-#child.expect("Password: ");
-#child.sendline("password");
-#child.expect(pexpect.EOF)'
-#EOD
-#)
-
-  run $prefix storageos $cliopts user create awesomeAdmin --role admin --groups foo,bar
+  run $prefix storageos $cliopts user create awesomeAdmin --role admin --groups foo,bar --password foobar123
   echo $output
   assert_success
 
