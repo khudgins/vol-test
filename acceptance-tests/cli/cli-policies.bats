@@ -6,10 +6,10 @@ load ../../test_helper
   run $prefix storageos $cliopts user create policyTestUser --role user --password policiesAreCool
   assert_success
 
-  run $prefix storageos $cliopts namespace create policyTestNamespace
+  run $prefix storageos $cliopts namespace create policytestnamespace
   assert_success
 
-  run $prefix storageos $cliopts policy create --user policyTestUser --namespace policyTestNamespace
+  run $prefix storageos $cliopts policy create --user policyTestUser --namespace policytestnamespace
   assert_success
 }
 
@@ -17,10 +17,10 @@ load ../../test_helper
   run $prefix storageos $cliopts user create unprivileged --role user --password policiesAreCool
   assert_success
 
-  run $prefix storageos -u unprivileged -p policiesAreCool volume create myVol1 --namespace policyTestNamespace
+  run $prefix storageos -u unprivileged -p policiesAreCool volume create myVol --namespace policytestnamespace
   assert_failure
 
-  run $prefix storageos -u policyTestUser -p policiesAreCool volume create myVol1 --namespace policyTestNamespace
+  run $prefix storageos -u policyTestUser -p policiesAreCool volume create myVol --namespace policytestnamespace
   assert_success
 
 }

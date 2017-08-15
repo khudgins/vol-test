@@ -32,6 +32,9 @@ load ../../test_helper
 }
 
 @test "delete user" {
+  run $prefix storageos $cliopts user inspect awesomeUser
+  echo $output
+
   run $prefix storageos $cliopts user rm awesomeUser
   assert_success
 
