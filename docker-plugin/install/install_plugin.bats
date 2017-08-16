@@ -20,9 +20,9 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
   fi
 
 
- set -x
-  run $prefix docker plugin install --grant-all-permissions $driver CLUSTER_ID=$(cat $CID_FILE)
-  set +x
+ #set -x
+  run $prefix docker plugin install --alias storageos --grant-all-permissions $driver CLUSTER_ID=$(cat $CID_FILE)
+  #set +x
   assert_success
 }
 
@@ -33,7 +33,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
     skip
   fi
 
-  run $prefix2 docker plugin install --grant-all-permissions $driver CLUSTER_ID=$(cat $CID_FILE)
+  run $prefix2 docker plugin install --alias storageos --grant-all-permissions $driver CLUSTER_ID=$(cat $CID_FILE)
   assert_success
 }
 
@@ -44,6 +44,6 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
     skip
   fi
 
-  run $prefix3 docker plugin install --grant-all-permissions $driver "CLUSTER_ID=$(cat $CID_FILE)"
+  run $prefix3 docker plugin install --alias storageos --grant-all-permissions $driver "CLUSTER_ID=$(cat $CID_FILE)"
   assert_success
 }
