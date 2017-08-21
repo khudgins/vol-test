@@ -9,9 +9,11 @@ load "../../test_helper"
     skip
   fi
 
+  run $prefix docker plugin disable storageos -f
+  run $prefix docker plugin rm storageos
   run $prefix docker plugin install --grant-all-permissions $driver $pluginopts
-  sleep 60
   assert_success
+  sleep 60
 }
 
 @test "Test: Create volume using driver ($driver)" {
