@@ -24,7 +24,9 @@ vol_prefix="$prefix storageos $cliopts volume"
 
 @test "create rule no namespace" {
   run $rule_prefix create test-no-namespace --label app=xx
-  assert_failure
+
+  # uses default namespace
+  assert_success
 }
 
 @test "create replicator rule for repl=true" {
