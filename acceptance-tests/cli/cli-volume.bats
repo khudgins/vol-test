@@ -25,8 +25,8 @@ vol_prefix="$prefix storageos $cliopts volume"
 
 @test "create disk -  no namespace" {
   run $vol_prefix create nonamespace
-  assert_failure
-  assert_output --partial "no namespace provided"
+  # uses default namespace
+  assert_success
 }
 
 @test "create disk - already exists in namespace" {
