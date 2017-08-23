@@ -23,6 +23,17 @@ namespace_prefix="$prefix storageos $cliopts namespace"
   assert_failure
 }
 
+@test "create namespace - non-admin" {
+  run $prefix storageos $cliopts user create awesomeUser --password foobar123
+  assert_success
+
+  run $prefix storageos -u awesomeUser -p foobar123 namespace create
+  assert_failure
+
+  run $prefix storageos $cliopts user rm awesomeUser
+  assert_success
+}
+
 @test "can create disk in namespace" {
   run $prefix storageos $cliopts volume create -n $NAMESPACE test
   assert_success
