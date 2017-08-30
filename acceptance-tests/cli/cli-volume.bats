@@ -61,7 +61,7 @@ vol_prefix="$prefix storageos $cliopts volume"
   assert_success
 
   # add a regression for unmount deleting parent dir
-  run $prefix test -e /media
+  run $prefix test -e /media/testmount
   assert_success
 }
 
