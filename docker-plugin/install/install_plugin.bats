@@ -8,8 +8,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
 
 @test "create cluster" {
  run $prefix storageos $cliopts cluster create
- export CLUSTER_ID=$(echo $output | cut -d ':' -f 2 | xargs)
- [[ -n $CLUSTER_ID ]] && echo $CLUSTER_ID > $CID_FILE
+ [[ -n $output ]] && echo $output > $CID_FILE
 }
 
 @test "Install plugin for driver ($driver) on 1st node with $CLUSTER_ID" {
