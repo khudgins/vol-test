@@ -168,6 +168,7 @@ function provision_do_nodes()
 
     echo "$droplet: Copying StorageOS CLI"
     scp -p "$cli_binary" "root@${ip}:/usr/local/bin/storageos"
+    ssh "root@${ip}" "chmod +x /usr/local/bin/storageos"
     ssh "root@${ip}" "export STORAGEOS_USERNAME=storageos >>/root/.bashrc"
     ssh "root@${ip}" "export STORAGEOS_PASSWORD=storageos >>/root/.bashrc"
 
