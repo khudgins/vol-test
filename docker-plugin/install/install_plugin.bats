@@ -17,7 +17,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
  assert_success
 }
 
-@test "Install plugin for driver ($driver) on 1st node" {
+@test "Install plugin on 1st node" {
 
   run $prefix -t "docker plugin ls | grep $driver"
   if [[ $status -eq 0 ]]; then
@@ -31,7 +31,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
   assert_success
 }
 
-@test "Install plugin for driver ($driver) on 2nd node" {
+@test "Install plugin on 2nd node" {
 
   run $prefix2 -t "docker plugin ls | grep $driver"
   if [[ $status -eq 0 ]]; then
@@ -42,7 +42,7 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
   assert_success
 }
 
-@test "Install plugin for driver ($driver) on 3rd node" {
+@test "Install plugin on 3rd node" {
 
   run $prefix3 -t "docker plugin ls | grep $driver"
   if [[ $status -eq 0 ]]; then
