@@ -1,0 +1,38 @@
+
+module "storageos_cluster-{{JOBUID}}"  {
+  source = "./cluster"
+  do_token = "${var.do_token}"
+  region="nyc1"
+  tag="${var.tag}-{{JOBUID}}"
+  cluster_size="3"
+  pvt_key_path="${var.pvt_key_path}"
+  ubuntu_version="ubuntu-16-04-x64"
+  cli_version="0.0.12"
+  node_container_version="{{VERSION}}"
+  ssh_fingerprint="${digitalocean_ssh_key.default.fingerprint}" 
+
+}
+
+output "cluster_conn-{{JOBUID}}" {
+  value = "${module.storageos_cluster.ip-addrs}"
+}
+
+
+resource "null_resource" "copy-stress-tests-{{JOBUID}}" {
+  count = 3
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    inline = [
+      "echo INSTANCE_NUMBER=${count.index + 1}",
+      "echo specialspecialspecialspecial "
+    ]
+  }
+}
+

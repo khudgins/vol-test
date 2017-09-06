@@ -4,9 +4,9 @@ resource "digitalocean_tag" "tag" {
   name = "${var.tag}"
 }
 
-resource "digitalocean_ssh_key" "default" {
-  name       = "storageos ssh key"
-  public_key = "${file(var.pub_key)}"
+# Template for INITIAL_CLUSTER configuration
+data "template_file" "cluster_config" {
+  template = "INITIAL_CLUSTER=${join(",", formatlist("%s=http://%s:5707", "${digitalocean_droplet.storageos-ubuntu.*.name}", "${digitalocean_droplet.storageos-ubuntu.*.ipv4_address}"))}"
 }
 
 resource "digitalocean_droplet" "storageos-ubuntu" {
@@ -14,9 +14,9 @@ resource "digitalocean_droplet" "storageos-ubuntu" {
   name = "machine-${count.index}"
   region = "lon1"
   size = "2gb"
-  image = "${var.ubuntu-version}"
+  image = "${var.ubuntu_version}"
   ssh_keys = [ 
-       "${digitalocean_ssh_key.default.fingerprint}" 
+       "${var.ssh_fingerprint}" 
      ] 
   tags = ["${digitalocean_tag.tag.id}"]
   private_networking = true
@@ -31,7 +31,25 @@ resource "digitalocean_droplet" "storageos-ubuntu" {
   provisioner "remote-exec" {
     inline = ["curl -fsSL get.docker.com -o get-docker.sh","sh get-docker.sh","sudo modprobe nbd nbds_max=1024",
     "echo 'options nbd nbds_max=1024' > /etc/modprobe.d/nbd.conf",
-    "mkdir -p /var/lib/storageos", "docker run -d --name storageos -e HOSTNAME  -e ADVERTISE_IP=${self.ipv4_address_private} -e CLUSTER_ID=${var.cluster_id}  --net=host  --pid=host --privileged  --cap-add SYS_ADMIN  --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins  storageos/node server"]
-
+    "mkdir -p /var/lib/storageos",
+    "curl -sSL https://github.com/storageos/go-cli/releases/download/${var.cli_version}/storageos_linux_amd64 > /usr/local/bin/storageos","chmod +x /usr/local/bin/storageos"]
   }
 }
+
+resource "null_resource" "run-storageOS" {
+  count = 3
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(digitalocean_droplet.storageos-ubuntu.*.ipv4_address , count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    inline = [
+      "echo INSTANCE_NUMBER=${count.index + 1}",
+      "sudo docker run -d --name storageos -e HOSTNAME  -e ADVERTISE_IP=${element(digitalocean_droplet.storageos-ubuntu.*.ipv4_address , count.index)} -e ${data.template_file.cluster_config.rendered}  --net=host  --pid=host --privileged  --cap-add SYS_ADMIN  --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:${var.node_container_version} server"]
+  }
+}
+

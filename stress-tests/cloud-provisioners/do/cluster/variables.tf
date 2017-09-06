@@ -1,26 +1,33 @@
 
-variable "ubuntu-version" {
+variable "ubuntu_version" {
   description = "Ubuntu version for digital ocean tags"
 }
 
 variable "tag" {
-  description = "Optional tag on cluster instances"
+  description = "tag on cluster instances"
 }
 
 variable "cluster_size" {
   description = "size of storageos cluster"
 }
 
-variable "cluster_id" {
-  description = "storageos cluster id"
+variable "cli_version" {
+  description = "Version of cli to download on each node"
+}
+
+variable "node_container_version" {
+  description = "Version of the storageos/node container to run"
 }
 
 variable "region" {
   description = "digital ocean region for cluster"
 }
 
+variable "ssh_fingerprint" {
+  description = "SSH fingerprint of key to add to digital ocean, must be already in account"
+}
+
 variable "do_token" {}
-variable "pub_key" {}
 variable "pvt_key_path" {}
 
 

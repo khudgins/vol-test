@@ -1,0 +1,77 @@
+provider "digitalocean" {
+  token = "${var.do_token}"
+} 
+
+resource "digitalocean_ssh_key" "default" {
+  name       = "storageos ssh key"
+  public_key = "${file(var.pub_key)}"
+}
+
+module "storageos_cluster"  {
+  source = "./cluster"
+  do_token = "${var.do_token}"
+  region="nyc1"
+  tag="${var.tag}-blablabla"
+  cluster_size="3"
+  cli_version="0.0.12"
+  node_container_version="storageos/node:0.8.1"
+  ssh_fingerprint="${digitalocean_ssh_key.default.fingerprint}" 
+  pvt_key_path="${var.pvt_key_path}"
+  ubuntu_version="ubuntu-16-04-x64"
+}
+
+output "cluster_conn" {
+  value = "${module.storageos_cluster.ip-addrs}"
+}
+
+resource "null_resource" "copy-stress-tests" {
+  count = 3
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    inline = [
+      "echo INSTANCE_NUMBER=${count.index + 1}",
+    ]
+  }
+}
+
+module "storageos_cluster_2"  {
+  source = "./cluster"
+  do_token = "${var.do_token}"
+  region="nyc1"
+  tag="${var.tag}-blablabla"
+  cluster_size="3"
+  cli_version="0.0.12"
+  node_container_version="storageos/node:0.8.1"
+  pvt_key_path="${var.pvt_key_path}"
+  ssh_fingerprint="${digitalocean_ssh_key.default.fingerprint}" 
+  ubuntu_version="ubuntu-16-04-x64"
+}
+
+output "cluster_conn_2" {
+  value = "${module.storageos_cluster_2.ip-addrs}"
+}
+
+resource "null_resource" "copy-stress-tests_2" {
+  count = 3
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster_2.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    inline = [
+      "echo INSTANCE_NUMBER=${count.index + 1}",
+    ]
+  }
+}
+
