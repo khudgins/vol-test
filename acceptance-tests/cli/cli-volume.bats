@@ -49,15 +49,19 @@ vol_prefix="$prefix storageos $cliopts volume"
   assert_failure
 }
 
-@test "mount disk" {
+@test "mount disk" { # Should be re-enabled once node is also tested in BATS
   skip # currently know to fail due to mount propagation bug..
   run $vol_prefix mount $FULL_NAME /media/testmount
   assert_success
 }
 
-@test "unmount disk" {
+@test "unmount disk" { # Should be re-enabled once node is also tested in BATS
   skip # currently know to fail due to mount propagation bug..
   run $vol_prefix unmount $FULL_NAME
+  assert_success
+
+  # add a regression for unmount deleting parent dir
+  run $prefix test -e /media/testmount
   assert_success
 }
 
