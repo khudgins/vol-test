@@ -6,12 +6,18 @@ load ../../test_helper
 
 CID_FILE=$BATS_TEST_DIRNAME/CID
 
-@test "create cluster" {
+@test "Create cluster allocation" {
  run $prefix storageos $cliopts cluster create
  [[ -n $output ]] && echo $output > $CID_FILE
 }
 
-@test "Install plugin for driver ($driver) on 1st node with $CLUSTER_ID" {
+@test "Verify cluster id" {
+ export CLUSTER_ID=$(cat $CID_FILE)
+ echo $CLUSTER_ID | egrep '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+ assert_success
+}
+
+@test "Install plugin for driver ($driver) on 1st node" {
 
   run $prefix -t "docker plugin ls | grep $driver"
   if [[ $status -eq 0 ]]; then
