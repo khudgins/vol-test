@@ -207,7 +207,7 @@ export DO_TAG="${tag}"
 EOF
 
   echo "SUCCESS!  Ready to run tests:"
-  echo "  ./run-volume-tests.sh"
+  echo "  ./run_volume_tests.sh"
   echo " Your environment credentials will be in test.env .. you may source it to interact with it manually"
 
 }
