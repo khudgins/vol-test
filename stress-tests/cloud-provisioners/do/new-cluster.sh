@@ -2,24 +2,14 @@
 
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# TODO: provision new key and add to jenkins slaves
+if [[ -z $JOBUID ]] || [[ -z $STORAGEOS_VERSION ]];
+  (>&2 echo "incorrect usage of this script, please trigger with ./stress-test-trigger from Top level directory")
 
-if [[ -z $SUITE ]] || [[ -z "$STORAGEOS_VERSION" ]]; then
-  (>2& echo "Please specify the Job you want to run and the container version") 
-  exit 1
-fi
+# build supervisor binary
 
-JOBUID=$SUITE-$(echo $STORAGEOS_VERSION | tr '.' '_')
+# assume that the binary is built and available on GOBIN (FOR NOW)
 
-set +x
-
-if [[ -f "$PROJECT_DIR/$JOBUID.txt" ]]; then
-  (>2& echo "This job already exists, cancel through cancel job to restart") 
-  exit 1
-fi  
-set -x
-
-VERSION=$STORAGEOS_VERSION JOBUID=$JOBUID $PROJECT_DIR/lib/bash-templater/templater.sh cluster.template > $JOBUID.tf
+env BINARY_PATH=$GOBIN/runner VERSION=$STORAGEOS_VERSION JOBUID=$JOBUID $PROJECT_DIR/lib/bash-templater/templater.sh cluster.template > $JOBUID.tf
 
 terraform plan -var "tag=stress"  \
   -var "do_token=4ebbb814ce4d4edb19f4a8c410cdf2944fd74b110f10e5650030bc3802e9a0cb" \

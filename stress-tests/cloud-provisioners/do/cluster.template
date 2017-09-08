@@ -10,7 +10,6 @@ module "storageos_cluster-{{JOBUID}}"  {
   cli_version="0.0.12"
   node_container_version="{{VERSION}}"
   ssh_fingerprint="${digitalocean_ssh_key.default.fingerprint}" 
-
 }
 
 output "cluster_conn-{{JOBUID}}" {
@@ -18,10 +17,10 @@ output "cluster_conn-{{JOBUID}}" {
 }
 
 
-resource "null_resource" "copy-stress-tests-{{JOBUID}}" {
+resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
   count = 3
 
-  provisioner "remote-exec" {
+  provisioner "file" {
     connection {
       type = "ssh"
       user = "root"
@@ -29,10 +28,36 @@ resource "null_resource" "copy-stress-tests-{{JOBUID}}" {
       private_key = "${file(var.pvt_key_path)}"
       timeout = "10s"
     }
-    inline = [
-      "echo INSTANCE_NUMBER=${count.index + 1}",
-      "echo specialspecialspecialspecial "
-    ]
+
+    source = "{{BINARY_PATH}}"
+    dest = "~/go/bin/runner"
+  }
+
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+
+    source = "./config/{{JOBUID}}"
+    dest = "~/{{JOBUID}}"
+  }
+
+  provisioner "remote_exec" {
+
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    
+    inline = ["runner --jobs ~/{{JOBUID}}"]
+    
   }
 }
 
