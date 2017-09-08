@@ -13,7 +13,7 @@ load "../../test_helper"
   assert_line --partial "default/clivol"
 }
 
-@test "Confirm volume is created (docker volume ls) using driver ($driver)" {
+@test "Confirm volume is created (docker volume ls) using driver (storageos)" {
   run $prefix docker volume ls
   assert_line --partial "clivol"
 }
@@ -24,9 +24,9 @@ load "../../test_helper"
   assert_line --partial "\"status\": \"active"
 }
 
-@test "Confirm docker volume inspect works using driver ($driver)" {
+@test "Confirm docker volume inspect works using driver (storageos)" {
   run $prefix docker volume inspect clivol
-  assert_line --partial "\"Driver\": \"$driver"
+  assert_line --partial "\"Driver\": \"storageos:latest"
 }
 
 @test "Start a container and mount the volume" {

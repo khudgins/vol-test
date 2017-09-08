@@ -2,12 +2,12 @@
 
 # shellcheck disable=SC2086
 
-driver=notset
+driver=storageos
 
 # shellcheck disable=SC1091 source=../../test.env
-. ../../test.sh
+. ../../test.env
 
-rm_plugin="docker plugin rm $driver"
+rm_plugin="docker plugin rm -f $driver"
 
 $PREFIX $rm_plugin
 $PREFIX2 $rm_plugin
