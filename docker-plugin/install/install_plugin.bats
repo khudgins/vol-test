@@ -14,7 +14,6 @@ CID_FILE=$BATS_TEST_DIRNAME/CID
 @test "Verify cluster id" {
  export CLUSTER_ID=$(cat $CID_FILE)
  echo $CLUSTER_ID | egrep '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
- assert_success
 }
 
 @test "Install plugin on 1st node" {
