@@ -10,7 +10,7 @@ def generate_fio_job_array(container):
 
 def generate_kernel_job_array(container):
     if container:
-        return {'fio':{'exec': 'docker', 'args': ['run', '-rm', '-v', 'stress-test:/data','storageos/kernel-compile' ]}}
+        return {'fio':{'exec': 'docker', 'args': ['run', '-rm', '-v', '${VOLNAME}:/data','storageos/kernel-compile' ]}}
     else:
         return 
 

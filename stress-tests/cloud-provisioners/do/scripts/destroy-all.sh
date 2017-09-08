@@ -4,6 +4,9 @@
 
 # TODO: provision new key and add to jenkins slaves
 
+PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
+
+pushd $PROJECT_DIR
 
 terraform destroy -var "tag=stress"  \
   -var "do_token=4ebbb814ce4d4edb19f4a8c410cdf2944fd74b110f10e5650030bc3802e9a0cb" \
@@ -11,4 +14,4 @@ terraform destroy -var "tag=stress"  \
 -var "pvt_key_path=/home/houssem/code/vol-test/stress-tests/cloud-provisioners/do/temp-key" \
 -var "ssh_fingerprint=b1:cd:87:e6:e9:79:4a:eb:05:a0:83:65:18:18:6e:a5"
 
-
+popd
