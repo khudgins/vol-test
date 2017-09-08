@@ -5,6 +5,8 @@ load ../../test_helper
 @test "create cluster with defaults" {
   run $prefix storageos $cliopts cluster create
   assert_success
+  echo $output | egrep '^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+  assert_success
   run $prefix storageos $cliopts cluster rm $output
   assert_success
 }
