@@ -58,6 +58,14 @@ function delete_tags()
     $doctl_auth compute tag delete -f "$tag"
 }
 
+function delete_cid()
+{
+    if [ -f ./docker-plugin/install/CID ]; then
+        echo "deleting cached cluster id"
+        rm ./docker-plugin/install/CID
+    fi
+}
+
 function MAIN()
 {
     # set -x
@@ -65,6 +73,7 @@ function MAIN()
     doctl_auth="doctl -t $DO_TOKEN"
     destroy_do_runners
     delete_tags
+    delete_cid
     # set +x
 }
 
