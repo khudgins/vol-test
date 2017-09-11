@@ -1,11 +1,3 @@
-provider "digitalocean" {
-  token = "${var.do_token}"
-} 
-
-resource "digitalocean_ssh_key" "default" {
-  name       = "storageos ssh key"
-  public_key = "${file(var.pub_key)}"
-}
 
 module "storageos_cluster"  {
   source = "./cluster"

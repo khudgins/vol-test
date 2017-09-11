@@ -1,0 +1,8 @@
+[Unit]
+Description=Runner systemd job for low-0_8_1
+
+[Service]
+ExecStart=/usr/local/bin/runner start --jobs /root/low-0_8_1
+
+[Install]
+WantedBy=multi-user.target
