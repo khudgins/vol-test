@@ -1,7 +1,10 @@
 #!/bin/bash -ex 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-#. envfile.sh
+# Only source env if vars aren't set (by Jenkins) so it can be run manually
+if [[ -z $IAAS ]]; then
+  . envfile.sh
+fi
 
   # TODO: provision new key and add to jenkins slaves
 
