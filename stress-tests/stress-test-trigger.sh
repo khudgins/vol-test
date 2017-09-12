@@ -23,7 +23,7 @@ for IaaS in $IAAS; do
       (>2& echo "Job file already exists, Provisioner failed for suites on $IaaS, continuing..")
       continue 
     else
-      file=$(tempfile)
+      file=$(mktemp)
 
       if [[ $CONTAINER == "true" ]]; then
         cat $IAASDIR/jobs/container/$DEPTH > $file
