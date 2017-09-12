@@ -1,7 +1,7 @@
 #!/bin/bash -ex 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. envfile.sh
+#. envfile.sh
 
   # TODO: provision new key and add to jenkins slaves
 
