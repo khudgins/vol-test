@@ -41,7 +41,7 @@ for IaaS in $IAAS; do
 
       mkdir -p $IAASDIR/configs
       cp -T $file $IAASDIR/configs/$JOBUID
-      env JOBUID=$JOBUID STORAGEOS_VERSION=$STORAGEOS_VERSION $IAASDIR/scripts/new-cluster.sh 
+      env DO_TOKEN=$DO_TOKEN PVTK_PATH=$PVTK_PATH PUBK_PATH=$PUBK_PATH JOBUID=$JOBUID STORAGEOS_VERSION=$STORAGEOS_VERSION $IAASDIR/scripts/new-cluster.sh 
     fi
 
 done 

@@ -2,6 +2,8 @@
 
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
 
+PVTK_PATH=${PVTK_PATH:=~/.ssh/id_rsa}
+PUBK_PATH=${PUBK_PATH:=~/.ssh/id_rsa.pub}
 if [[ -z $JOBUID ]] || [[ -z $STORAGEOS_VERSION ]]; then
   (>&2 echo "incorrect usage of this script, please trigger with ./stress-test-trigger from Top level directory")
   exit 1
@@ -16,12 +18,9 @@ env JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/templater.sh" "$PROJECT_DIR/
 terraform get
 terraform init
 
-if [[ -z BUILD_TAG ]]; then
+if [[ -z $BUILD_TAG ]]; then
   PVTK_PATH=$PROJECT_DIR/keys/temp-key
   PUBK_PATH=$PROJECT_DIR/keys/temp-key.pub
-else
-  PUBK_PATH=/home/jenkins/.ssh/id_rsa.pub
-  PVTK_PATH=/home/jenkins/.ssh/id_rsa
 fi
 
 SSH_FINGERPRINT=$(ssh-keygen -lf $PUBK_PATH -E md5 | awk '{ print $2 }' | cut -d ':' -f 2-)
