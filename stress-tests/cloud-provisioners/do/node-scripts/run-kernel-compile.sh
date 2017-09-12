@@ -1,3 +1,5 @@
 #!/bin/bash -ex
 
-sudo docker run hello-world
+sudo storageos -u storageos -p storageos mount $HOSTNAME /data
+
+./kernel-compile.sh
