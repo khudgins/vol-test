@@ -16,7 +16,7 @@ env JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/templater.sh" "$PROJECT_DIR/
 terraform get
 terraform init
 
-if [[ -z BUILD_JOB ]]; then
+if [[ -z BUILD_TAG ]]; then
   PVTK_PATH=$PROJECT_DIR/keys/temp-key
   PUBK_PATH=$PROJECT_DIR/keys/temp-key.pub
 else
@@ -26,7 +26,7 @@ fi
 
 SSH_FINGERPRINT=$(ssh-keygen -lf $PUBK_PATH -E md5 | awk '{ print $2 }' | cut -d ':' -f 2-)
 
-terraform apply -var "tag=stress" \
+terraform apply -var "tag=stress-$BUILD_TAG" \
   -var "do_token=$DO_TOKEN" \
   -var "pub_key_path=$PUBK_PATH" \
   -var "pvt_key_path=$PVTK_PATH" \
