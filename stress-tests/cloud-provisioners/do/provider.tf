@@ -8,6 +8,6 @@ provider "digitalocean" {
 
 resource "digitalocean_ssh_key" "default" {
   name       = "storageos ssh key"
-  public_key = "${file(var.pub_key)}"
+  public_key = "${file(var.pub_key_path)}"
 }
 

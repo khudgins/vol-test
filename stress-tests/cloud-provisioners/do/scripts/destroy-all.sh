@@ -8,10 +8,19 @@ PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
 
 pushd $PROJECT_DIR
 
-terraform destroy -var "tag=stress"  \
-  -var "do_token=4ebbb814ce4d4edb19f4a8c410cdf2944fd74b110f10e5650030bc3802e9a0cb" \
-  -var "pub_key=/home/houssem/code/vol-test/stress-tests/cloud-provisioners/do/keys/temp-key.pub" \
--var "pvt_key_path=/home/houssem/code/vol-test/stress-tests/cloud-provisioners/do/keys/temp-key" \
--var "ssh_fingerprint=b1:cd:87:e6:e9:79:4a:eb:05:a0:83:65:18:18:6e:a5"
+PVTK_PATH=$PROJECT_DIR/keys/temp-key
+PUBK_PATH=$PROJECT_DIR/keys/temp-key.pub
+
+SSH_FINGERPRINT=$(ssh-keygen -lf $PUBK_PATH -E md5 | awk '{ print $2 }' | cut -d ':' -f 2-)
+
+terraform destroy -var "tag=stress" \
+  -var "do_token=$DO_TOKEN" \
+  -var "pub_key_path=$PUBK_PATH" \
+  -var "pvt_key_path=$PVTK_PATH" \
+  -var "ssh_fingerprint=$SSH_FINGERPRINT" 
+
+rm -rf ./configs/**
+
+rm -f stress-cluster*.tf
 
 popd

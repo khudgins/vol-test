@@ -3,7 +3,7 @@ variable "tag" {
 }
 
 variable "do_token" {}
-variable "pub_key" {}
+variable "pub_key_path" {}
 variable "pvt_key_path" {}
 
 
