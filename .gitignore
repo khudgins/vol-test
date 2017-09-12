@@ -2,3 +2,8 @@ user_provision.sh
 test.env
 storageos_linux_*
 cli_build/
+
+# stress tests
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
