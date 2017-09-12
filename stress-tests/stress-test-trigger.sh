@@ -10,6 +10,11 @@ if [[ -z $DEPTH ]] || [[ -z "$STORAGEOS_VERSION" ]]; then
   exit 1
 fi
 
+if ! which terraform; then
+  (>2& echo "Terraform must be installed and in your path") 
+  exit 1
+fi
+
 function main() {
 for IaaS in $IAAS; do
     IAASDIR="$DIR/cloud-provisioners/${IaaS}/"
