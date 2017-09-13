@@ -1,3 +1,14 @@
 #!/bin/bash -ex
 
-sudo docker run -v $HOSTNAME:/data soegarots/kernel-compile:0.0.2
+# this script will be continually executed from the runner
+# it will be running on every node
+
+voluid=$(genuid | cut -c1:5)
+
+# waiting for controller to be healthy..
+sleep 30
+storageos -u storageos -p storageos volume create $voluid
+
+sudo docker run -v $voluid:/data soegarots/kernel-compile:0.0.2
+
+storageos -u storageos -p storageos volume rm default/$voluid

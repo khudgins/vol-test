@@ -1,8 +1,5 @@
 description: low level of stress testing
 jobs:
-  create-volume:
-    exec: "bash"
-    args: ["-c", "~/node-scripts/create-volume.sh","low"]
   run-kernel-compile:
     exec: "bash"
     args: ["-c", "~/node-scripts/run-kernel-compile-container.sh"]
