@@ -4,7 +4,7 @@
 # it will be running on every node
 
 
-voluid=$(uuidgen | cut -c1:5)
+voluid=$(uuidgen | cut -c1-5)
 
 CREDS="-u storageos -p storageos"
 
