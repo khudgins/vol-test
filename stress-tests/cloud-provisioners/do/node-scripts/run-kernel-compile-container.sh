@@ -3,7 +3,7 @@
 # this script will be continually executed from the runner
 # it will be running on every node
 
-voluid=$(genuid | cut -c1:5)
+voluid=$(uuidgen | cut -c1:5)
 
 # waiting for controller to be healthy..
 sleep 30
