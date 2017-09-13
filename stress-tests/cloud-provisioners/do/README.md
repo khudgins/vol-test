@@ -1,5 +1,5 @@
 This directory contains provisioning script and is the terraform workspace for the
-terraform configuration that contains all the stress-test clusters..
+terraform configuration that generates the stress-test cluster
 
 As explained in the Top level readme. tempaltes in `templates/` are rendered to generate cluster configuration
 from `./cluster` module and runner configuration.
