@@ -23,14 +23,10 @@ for IaaS in $IAAS; do
     IAASDIR="$DIR/cloud-provisioners/${IaaS}/"
     
     # it is wasteful to run a job if identical depth and identical storageos version 
-    JOBUID="${DEPTH}-$(echo $STORAGEOS_VERSION | tr '.' '_')"
+    JOBUID="${DEPTH}-$(echo $STORAGEOS_VERSION | tr '.' '_')-$BUILD_TAG"
 
     # we take the existence of this unique job file to mean a cluster for this job is running
     # this is what the limitations of bash lead to..
-    if [[ -f $IAASDIR/configs/$JOBUID ]]; then
-      (>2& echo "Job file already exists, Provisioner failed for suites on $IaaS, continuing..")
-      continue 
-    else
       file=$(mktemp)
 
       if [[ $CONTAINER == "true" ]]; then
@@ -42,7 +38,6 @@ for IaaS in $IAAS; do
       mkdir -p $IAASDIR/configs
       cp -T $file $IAASDIR/configs/$JOBUID
       env DO_TOKEN=$DO_TOKEN PVTK_PATH=$PVTK_PATH PUBK_PATH=$PUBK_PATH JOBUID=$JOBUID STORAGEOS_VERSION=$STORAGEOS_VERSION $IAASDIR/scripts/new-cluster.sh 
-    fi
 
 done 
 }
