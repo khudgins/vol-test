@@ -6,7 +6,7 @@ declare -a ips
 plugin_name="${PLUGIN_NAME:-soegarots/plugin}"
 version="${VERSION:-latest}"
 cli_branch="${CLI_BRANCH:-}"
-cli_version="${CLI_VERSION:-0.0.11}"
+cli_version="${CLI_VERSION:-0.0.12}"
 
 branch_env="${BRANCH_ENV:-branchnotset}"
 # Make sure branch_env has at most 16 characters.
@@ -207,7 +207,7 @@ export DO_TAG="${tag}"
 EOF
 
   echo "SUCCESS!  Ready to run tests:"
-  echo "  ./run-volume-tests.sh"
+  echo "  ./run_volume_tests.sh"
   echo " Your environment credentials will be in test.env .. you may source it to interact with it manually"
 
 }
