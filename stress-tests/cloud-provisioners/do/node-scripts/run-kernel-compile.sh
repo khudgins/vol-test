@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 
 # this script will be continually executed from the runner
 # it will be running on every node
@@ -12,10 +12,12 @@ CREDS="-u storageos -p storageos"
 sleep 30
 storageos $CREDS volume create $voluid
 
-sudo storageos $CREDS mount default/$voluid /data
+sudo storageos $CREDS volume mount default/$voluid /data
 
-./kernel-compile.sh
+sudo ./kernel-compile.sh
 
-sudo storageos $CREDS umount /data
+sleep 5
+
+sudo storageos $CREDS volume unmount default/$voluid
 
 storageos -u storageos -p storageos volume rm default/$voluid
