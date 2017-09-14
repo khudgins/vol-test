@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+export TF_LOGS=DEBUG
+
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
 
 PVTK_PATH=${PVTK_PATH:=~/.ssh/id_rsa}
