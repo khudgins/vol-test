@@ -2,4 +2,4 @@ description: low level of stress testing
 jobs:
   run-kernel-compile:
     exec: "bash"
-    args: ["-c", "~/node-scripts/run-kernel-compile-container.sh"]
+    args: ["-c", "~/node-scripts/kernel-compile/run-kernel-compile-container.sh"]

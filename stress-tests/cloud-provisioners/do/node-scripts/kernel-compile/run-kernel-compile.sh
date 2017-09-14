@@ -3,6 +3,7 @@
 # this script will be continually executed from the runner
 # it will be running on every node
 
+NODE_SCRIPT_DIR="~/node-scripts/"
 
 voluid=$(uuidgen | cut -c1-5)
 
@@ -14,7 +15,7 @@ storageos $CREDS volume create $voluid
 
 sudo storageos $CREDS volume mount default/$voluid /data
 
-sudo ./kernel-compile.sh
+sudo $NODE_SCRIPT_DIR/src/dpload/kernel-compile/kernel-compile.sh
 
 sleep 5
 
