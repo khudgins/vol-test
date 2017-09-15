@@ -87,7 +87,7 @@ resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
       timeout = "10s"
     }
     
-    inline = ["DEBIAN_FRONTEND=noninteractive apt -q -y install fio jq", 
+    inline = ["DEBIAN_FRONTEND=noninteractive apt -q -y install fio jq build-essential bc", 
       "chmod -R u+x /usr/local/bin/runner /usr/local/bin/fiord  ~/node-scripts/**  &&  systemctl enable {{JOBUID}} --now"]
     
   }
