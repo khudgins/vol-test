@@ -7,7 +7,7 @@ NODE_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 
 USAGE="Usage: $0 testtype blocksize disktype"
 
-if [ "$#" -ne "4" ]; then
+if [ "$#" -ne "3" ]; then
   echo "$USAGE"
   exit 1
 fi
@@ -47,7 +47,7 @@ storageos $CREDS volume create $LABELS $voluid
 
 STORAGEOS_VOLID=$(storageos $CREDS volume inspect default/$voluid | jq --raw-output '.[] | .id')
 
-sudo $NODE_SCRIPT_DIR/src/dpload/fio-stress/fio-stress.sh $TEST_TYPE.yaml --bs=$BSIZE --filename/var/lib/storageos/volumes/$STORAGEOS_VOLID --rw $RW
+sudo $NODE_SCRIPT_DIR/src/dpload/fio-stress/fio-stress.sh $TEST_TYPE.fio --bs=$BSIZE --filename /var/lib/storageos/volumes/$STORAGEOS_VOLID --rw $RW
 
 storageos $CREDS volume rm default/$voluid
 

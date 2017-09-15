@@ -1,14 +1,11 @@
 [global]
-bs=4k
 ioengine=libaio
 direct=1
 random_generator=tausworthe
 random_distribution=random
 allow_file_create=0
-rw=randread
 percentage_random=100
 runtime=10
 
 [job1]
 numjobs=1
-filename=/var/lib/storageos/volumes/420d29ae-b700-d1dc-f4e2-6cf78ed39ace
