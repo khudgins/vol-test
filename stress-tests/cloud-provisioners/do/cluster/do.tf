@@ -29,7 +29,7 @@ resource "digitalocean_droplet" "storageos-ubuntu" {
   }
 
   provisioner "remote-exec" {
-    inline = ["curl -fsSL get.docker.com -o get-docker.sh","sh get-docker.sh","sudo modprobe nbd nbds_max=1024",
+    inline = ["export DEBIAN_FRONTEND=noninteractive", "apt -q -y clean", "apt -q -y update", "curl -fsSL get.docker.com -o get-docker.sh","sh get-docker.sh","sudo modprobe nbd nbds_max=1024",
     "echo 'options nbd nbds_max=1024' > /etc/modprobe.d/nbd.conf",
     "mkdir -p /var/lib/storageos",
     "curl -sSL https://github.com/storageos/go-cli/releases/download/${var.cli_version}/storageos_linux_amd64 > /usr/local/bin/storageos","chmod +x /usr/local/bin/storageos"]
