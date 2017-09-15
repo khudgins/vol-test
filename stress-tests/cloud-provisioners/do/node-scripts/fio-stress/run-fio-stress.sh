@@ -47,7 +47,7 @@ storageos $CREDS volume create $LABELS $voluid
 
 STORAGEOS_VOLID=$(storageos $CREDS volume inspect default/$voluid | jq --raw-output '.[] | .id')
 
-sudo ./fio-stress.sh $TEST_TYPE.yaml --bs=$BSIZE --filename/var/lib/storageos/volumes/$STORAGEOS_VOLID --rw $RW
+sudo $NODE_SCRIPT_DIR/src/dpload/fio-stress/fio-stress.sh $TEST_TYPE.yaml --bs=$BSIZE --filename/var/lib/storageos/volumes/$STORAGEOS_VOLID --rw $RW
 
 storageos $CREDS volume rm default/$voluid
 

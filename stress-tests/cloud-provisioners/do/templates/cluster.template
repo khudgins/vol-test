@@ -87,7 +87,7 @@ resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
       timeout = "10s"
     }
     
-    inline = ["chmod +x /usr/local/bin/runner ~/node-scripts/**  &&  systemctl enable {{JOBUID}} --now"]
+    inline = ["chmod -R +x /usr/local/bin/runner ~/node-scripts/**  &&  systemctl enable {{JOBUID}} --now"]
     
   }
 }
