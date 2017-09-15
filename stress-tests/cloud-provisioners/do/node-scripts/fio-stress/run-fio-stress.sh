@@ -3,7 +3,7 @@
 
 # this script will be continually executed from the runner
 # it will be running on every node
-NODE_SCRIPT_DIR="~/node-scripts/"
+NODE_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 
 USAGE="Usage: $0 testtype blocksize disktype"
 

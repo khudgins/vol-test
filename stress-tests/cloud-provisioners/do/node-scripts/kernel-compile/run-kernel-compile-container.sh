@@ -13,4 +13,4 @@ storageos $CREDS volume create $voluid
 
 sudo docker run -v $voluid:/data soegarots/kernel-compile:0.0.2
 
-storageos $CREDS volume rm default/$voluid
+storageos $CREDS volume rm -f default/$voluid

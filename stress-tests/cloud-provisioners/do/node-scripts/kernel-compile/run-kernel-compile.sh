@@ -3,7 +3,7 @@
 # this script will be continually executed from the runner
 # it will be running on every node
 
-NODE_SCRIPT_DIR="~/node-scripts/"
+NODE_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"/..
 
 voluid=$(uuidgen | cut -c1-5)
 
@@ -21,4 +21,4 @@ sleep 5
 
 sudo storageos $CREDS volume unmount default/$voluid
 
-storageos -u storageos -p storageos volume rm default/$voluid
+storageos -u storageos -p storageos volume rm -f default/$voluid

@@ -14,6 +14,6 @@ storageos $CREDS volume create $voluid
 
 #?
 
-storageos $CREDS volume rm default/$voluid
+storageos $CREDS volume rm -f default/$voluid
 
 
