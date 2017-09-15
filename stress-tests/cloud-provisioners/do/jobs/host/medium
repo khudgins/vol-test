@@ -1,8 +1,8 @@
 description: low level of stress testing
 jobs:
-#  run-kernel-compile:  TODO: ensure build-deps are on hosts
-#     exec: "bash"
-#     args: ["-c", "~/node-scripts/kernel-compile/run-kernel-compile.sh"]
+  run-kernel-compile:  TODO: ensure build-deps are on hosts
+     exec: "bash"
+     args: ["-c", "~/node-scripts/kernel-compile/run-kernel-compile.sh"]
   run-fio-ro-raw-4k:
     exec: "bash"
     args: ["-c", "~/node-scripts/fio-stress/run-fio-stress.sh", "basic", "4k", "raw"]
