@@ -7,5 +7,5 @@ allow_file_create=0
 percentage_random=100
 runtime=10
 
-[job1]
+[stress-test-basic]
 numjobs=1

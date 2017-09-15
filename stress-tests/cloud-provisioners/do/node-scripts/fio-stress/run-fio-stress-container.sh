@@ -13,6 +13,7 @@ CREDS="-u storageos -p storageos"
 storageos $CREDS volume create $voluid
 
 #?
+sudo docker run hello-world # stub
 
 storageos $CREDS volume rm -f default/$voluid
 

@@ -14,7 +14,7 @@ fi
 # assume that the binary is built and available  in /bin
 pushd $PROJECT_DIR
 
-env BINARY_PATH=$PROJECT_DIR/bin/runner VERSION=$STORAGEOS_VERSION JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/templater.sh" "$PROJECT_DIR/templates/cluster.template" > $PROJECT_DIR/stress-cluster-$JOBUID.tf
+env BINARY_PATH=$PROJECT_DIR/bin/ VERSION=$STORAGEOS_VERSION JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/templater.sh" "$PROJECT_DIR/templates/cluster.template" > $PROJECT_DIR/stress-cluster-$JOBUID.tf
 env JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/templater.sh" "$PROJECT_DIR/templates/systemd-service.template" > $PROJECT_DIR/configs/$JOBUID.service
 
 terraform get
