@@ -1,0 +1,15 @@
+[global]
+allow_file_create=0
+thread
+refill_buffers
+verify=crc32c-intel
+verify_backlog=32768
+ioengine=posixaio
+iodepth=16
+direct=1
+random_generator=tausworthe64
+random_distribution=random
+percentage_random=100
+
+[stress-test-checked]
+numjobs=1
