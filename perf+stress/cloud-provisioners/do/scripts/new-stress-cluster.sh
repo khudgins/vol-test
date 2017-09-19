@@ -20,11 +20,6 @@ env INFLUX_CONN=$INFLUX_CONN JOBUID=$JOBUID "$PROJECT_DIR/lib/bash-templater/tem
 terraform get
 terraform init
 
-if [[ -z $BUILD_TAG ]]; then
-  PVTK_PATH=$PROJECT_DIR/keys/temp-key
-  PUBK_PATH=$PROJECT_DIR/keys/temp-key.pub
-fi
-
 SSH_FINGERPRINT=$(ssh-keygen -lf $PUBK_PATH -E md5 | awk '{ print $2 }' | cut -d ':' -f 2-)
 
 terraform apply -var "tag=stress-$BUILD_TAG" \
