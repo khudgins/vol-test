@@ -30,9 +30,9 @@ for IaaS in $IAAS; do
       file=$(mktemp)
 
       if [[ $CONTAINER == "true" ]]; then
-        cat $IAASDIR/jobs/container/$DEPTH > $file
+        cp $IAASDIR/jobs/container/$DEPTH $file
       else
-        cat $IAASDIR/jobs/host/$DEPTH > $file
+        cp $IAASDIR/jobs/host/$DEPTH $file
       fi
 
       mkdir -p $IAASDIR/configs
