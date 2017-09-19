@@ -36,7 +36,7 @@ resource "digitalocean_droplet" "storageos-ubuntu" {
   }
 }
 
-resource "null_resource" "run-storageOS" {
+resource "null_resource" "run-storageos" {
   count = 3
 
   provisioner "remote-exec" {
@@ -49,7 +49,6 @@ resource "null_resource" "run-storageOS" {
     }
     inline = [
       "echo INSTANCE_NUMBER=${count.index + 1}",
-      "sudo docker run -d --name storageos -e HOSTNAME  -e ADVERTISE_IP=${element(digitalocean_droplet.storageos-ubuntu.*.ipv4_address , count.index)} -e ${data.template_file.cluster_config.rendered}  --net=host  --pid=host --privileged  --cap-add SYS_ADMIN  --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:${var.node_container_version} server"]
+      "sudo docker run -d --log-driver=fluentd --name storageos -e HOSTNAME  -e ADVERTISE_IP=${element(digitalocean_droplet.storageos-ubuntu.*.ipv4_address , count.index)} -e ${data.template_file.cluster_config.rendered}  --net=host  --pid=host --privileged  --cap-add SYS_ADMIN  --device /dev/fuse -v /var/lib/storageos:/var/lib/storageos:rshared -v /run/docker/plugins:/run/docker/plugins storageos/node:${var.node_container_version} server"]
   }
 }
-

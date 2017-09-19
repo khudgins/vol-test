@@ -20,7 +20,51 @@ output "cluster_conn-{{JOBUID}}" {
 resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
   count = 3
 
+  connection {
+    type = "ssh"
+    user = "root"
+    host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+    private_key = "${file(var.pvt_key_path)}"
+    timeout = "10s"
+  }
+
   /* setup fluentd */
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }
+    content = "deb http://packages.fluentbit.io/ubuntu xenial main"
+    destination = "/etc/apt/sources.list.d/fluentbit.list"
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }    
+    inline = ["wget -qO - http://packages.fluentbit.io/fluentbit.key | sudo apt-key add -",
+      "apt update", "DEBIAN_FRONTEND=noninteractive apt -q -y install td-agent-bit"]
+  }
+
+  provisioner "file" {
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
+      private_key = "${file(var.pvt_key_path)}"
+      timeout = "10s"
+    }    
+    source = "./files/td-agent-bit.conf"
+    destination = "/etc/td-agent-bit/td-agent-bit.conf"
+  }
+
     provisioner "file" {
     connection {
       type = "ssh"
@@ -28,25 +72,22 @@ resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
       host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
       private_key = "${file(var.pvt_key_path)}"
       timeout = "10s"
-    }
-
-    content = "deb http://packages.fluentbit.io/ubuntu xenial main"
-    destination = "/etc/apt/sources.list.d/fluentbit.list"
+    }    
+    source = "./files/td-agent-bit.service"
+    destination = "/etc/systemd/system/td-agent-bit.service"
   }
 
-    provisioner "remote-exec" {
+  provisioner "remote-exec" {
     connection {
       type = "ssh"
       user = "root"
       host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
       private_key = "${file(var.pvt_key_path)}"
       timeout = "10s"
-    }
-
-    inline = ["apt update", "DEBIAN_FRONTEND=noninteractive apt -q -y install td-agent-bit",
-      "systemctl enable td-agent-bit --now"]
-
+    }    
+    inline = ["systemctl enable td-agent-bit --now"]
   }
+
 
   /* copy the bundled binaries */ 
   provisioner "file" {
