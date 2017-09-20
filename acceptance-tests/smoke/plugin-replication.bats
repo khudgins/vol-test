@@ -3,7 +3,7 @@
 load ../../test_helper
 
 @test "Create replicated volume" {
-  run $prefix2 docker volume create --driver $driver $createopts --opt storageos.feature.replicas=1 repl-vol
+  run $prefix2 docker volume create --driver storageos $createopts --opt storageos.feature.replicas=1 repl-vol
   assert_success
 }
 
@@ -48,7 +48,7 @@ load ../../test_helper
 }
 
 @test "Stop storageos on node 2" {
-  run $prefix2 docker plugin disable -f $driver
+  run $prefix2 docker plugin disable -f storageos
   assert_success
 }
 
@@ -63,7 +63,7 @@ load ../../test_helper
 }
 
 @test "Re-start storageos on node 2" {
-  run $prefix2 docker plugin enable $driver
+  run $prefix2 docker plugin enable storageos
   assert_success
 }
 

@@ -2,21 +2,21 @@
 
 load "../../test_helper"
 
-@test "Test: Install plugin for driver ($driver) on node 2" {
+@test "Test: Install plugin for driver (storageos) on node 2" {
   #skip "This test works, faster for rev without it"
-  run $prefix2 -t "docker plugin ls | grep $driver"
+  run $prefix2 -t "docker plugin ls | grep storageos"
   if [[ $status -eq 0 ]]; then
     skip
   fi
 
   run $prefix2 docker plugin disable storageos -f
   run $prefix2 docker plugin rm storageos
-  run $prefix2 docker plugin install --grant-all-permissions $driver $pluginopts
+  run $prefix2 docker plugin install --grant-all-permissions --alias storageos $driver $pluginopts
   sleep 60
   assert_success
 }
 
-@test "Test: Confirm volume is visible on second node (volume ls) using driver ($driver)" {
+@test "Test: Confirm volume is visible on second node (volume ls) using driver (storageos)" {
   run $prefix2 docker volume ls
   assert_line --partial "testvol"
 }
