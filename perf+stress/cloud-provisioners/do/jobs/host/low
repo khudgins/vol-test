@@ -1,5 +1,0 @@
-description: low level of stress testing
-jobs:
-  run-kernel-compile-host:
-    exec: "bash"
-    args: ["-c", "~/node-scripts/kernel-compile/run-kernel-compile.sh"]

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e -u
+
+do_sudo=""
+if [ "$(id -u)" -ne 0 ]; then
+	do_sudo=sudo
+fi
+
+if [ "`uname`" = "Linux" ]; then
+	echo "/opt/storageos/lib" | $do_sudo cp /dev/fd/0 /etc/ld.so.conf.d/storageos.conf
+	$do_sudo chmod 0644 /etc/ld.so.conf.d/storageos.conf
+	$do_sudo ldconfig
+fi
+exit 0

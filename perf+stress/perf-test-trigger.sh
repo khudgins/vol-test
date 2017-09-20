@@ -8,7 +8,7 @@ fi
 
   # TODO: provision new key and add to jenkins slaves
 
-if [[ -z $DEPTH ]] || [[ -z "$STORAGEOS_VERSION" ]]; then
+if [[ -z $PROFILE ]] || [[ -z "$STORAGEOS_VERSION" ]]; then
   (>2& echo "Please specify the Job you want to run and the container version") 
   exit 1
 fi
@@ -23,16 +23,16 @@ for IaaS in $IAAS; do
     IAASDIR="$DIR/cloud-provisioners/${IaaS}/"
     
     # it is wasteful to run a job if identical depth and identical storageos version 
-    JOBUID="${DEPTH}-$(echo $STORAGEOS_VERSION | tr '.' '_')-$BUILD_TAG"
+    JOBUID="${PROFILE}-$(echo $STORAGEOS_VERSION | tr '.' '_')-$BUILD_TAG"
 
     # we take the existence of this unique job file to mean a cluster for this job is running
     # this is what the limitations of bash lead to..
       file=$(mktemp)
 
       if [[ $CONTAINER == "true" ]]; then
-        cp $IAASDIR/jobs/container/$DEPTH $file
+        cp $IAASDIR/jobs/benchmark/container/$PROFILE $file
       else
-        cp $IAASDIR/jobs/host/$DEPTH $file
+        cp $IAASDIR/jobs/benchmark/host/$PROFILE $file
       fi
 
       mkdir -p $IAASDIR/configs
