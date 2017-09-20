@@ -35,10 +35,10 @@ function delete_tag() {
     echo "Function usage: ${FUNCNAME[0]} TAG" >&2
     exit 1
   fi
-  tagged_name="$($doctl_json compute droplet list --tag-name "$tag" | $jq_raw --raw-output '.[] | .name' | sort)"
-  for name in $tagged_name; do
-    echo "Deleting $name"
-    $doctl compute droplet rm -f "$name"
+  tagged_id="$($doctl_json compute droplet list --tag-name "$tag" | $jq_raw --raw-output '.[] | .id' | sort)"
+  for id in $tagged_id; do
+    echo "Deleting $id"
+    $doctl compute droplet rm -f "$id"
   done
 }
 

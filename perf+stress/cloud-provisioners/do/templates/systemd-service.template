@@ -1,0 +1,9 @@
+[Unit]
+Description=Runner systemd job for {{JOBUID}}
+
+[Service]
+Environment=INFLUX_CONN={{INFLUX_CONN}}
+ExecStart=/usr/local/bin/runner start --jobs /root/{{JOBUID}}
+
+[Install]
+WantedBy=multi-user.target
