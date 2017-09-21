@@ -3,7 +3,7 @@ module "storageos_cluster-{{JOBUID}}"  {
   source = "./cluster"
   do_token = "${var.do_token}"
   region="lon1"
-  machine_prefix={{JOBUID}}
+  machine_prefix="{{JOBUID}}"
   tag="${var.tag}-{{JOBUID}}"
   cluster_size="3"
   machine_size="4gb"
