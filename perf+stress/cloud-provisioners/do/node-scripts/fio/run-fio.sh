@@ -24,13 +24,13 @@ sleep 30
 
 case $DOPTIONS in
   1-rep)
-    LABELS="--label storageos.feature.replicas 1"
+    LABELS="--label storageos.feature.replicas=1"
     ;;
   2-rep)
-    LABELS="--label storageos.feature.replicas 2"
+    LABELS="--label storageos.feature.replicas=2"
     ;;
   no-cache)
-    LABELS="--label storageos.feature.nocache"
+    LABELS="--label storageos.feature.nocache=true"
     ;;
   **)
     LABELS=""
