@@ -60,10 +60,14 @@ for tag in $tags; do
     echo "Deleting $tag"
     delete_tag "$tag"
   else
-    read -rp "Delete droplets with tag '$tag'? [yn] " response
+    read -rp "Delete droplets with tag '$tag'? [ynN] " response
     case "$response" in
       [Yy]*)
         delete_tag "$tag"
+        ;;
+      N)
+        echo "not deleting all the other machines"
+        exit 0
         ;;
       *)
         echo "Did not delete droplets for tag '$tag'"

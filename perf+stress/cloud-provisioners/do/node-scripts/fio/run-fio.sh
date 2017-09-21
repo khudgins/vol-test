@@ -21,15 +21,16 @@ voluid=$(uuidgen | cut -c1-5)
 # waiting for controller to be healthy..
 sleep 30
 
+
 case $DOPTIONS in
   1-rep)
-    LABELS="storageos.feature.replicas 1"
+    LABELS="--label storageos.feature.replicas 1"
     ;;
   2-rep)
-    LABELS="storageos.feature.replicas 2"
+    LABELS="--label storageos.feature.replicas 2"
     ;;
   no-cache)
-    LABELS="storageos.feature.nocache"
+    LABELS="--label storageos.feature.nocache"
     ;;
   **)
     LABELS=""

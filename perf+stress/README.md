@@ -1,8 +1,7 @@
-# Stress tests 'framework'
+# Stress tests and benchmark 'framework'
 
 The Job runner allows to provision stress tests on top of regular storageos clusters.
 They are run through the runner [code](http://code.storageos.net/projects/TOOL/repos/runner/browse)
-
 
 When the pipeline is running it's entrypoint is './run-kernel-compile.sh', this is fed the env variables in `envfile.sh`
 configuring the IAAS for the stress tests, a pre-set setting of stress tests (low medium high) and whether the tests are run 

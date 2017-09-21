@@ -25,8 +25,6 @@ for IaaS in $IAAS; do
     # it is wasteful to run a job if identical depth and identical storageos version 
     JOBUID="${PROFILE}-$(echo $STORAGEOS_VERSION | tr '.' '_')-$BUILD_TAG"
 
-    # we take the existence of this unique job file to mean a cluster for this job is running
-    # this is what the limitations of bash lead to..
       file=$(mktemp)
 
       if [[ $CONTAINER == "true" ]]; then

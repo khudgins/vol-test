@@ -10,9 +10,9 @@ jobs:
     exclusive: true
   run-fio-ro-rep-4k:
     exec: "bash"
-    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh --bench basic 4k 1-rep"]
+    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh basic 4k 1-rep"]
     exclusive: true
   run-fio-check-raw-8mb:
     exec: "bash"
-    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh --bench check 8192k no-cache"] 
+    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh check 8192k no-cache"] 
     exclusive: true

@@ -3,6 +3,8 @@
 # Currently only ubuntu 16 is supported, drop in the right bundle to add support for different arch
 set -e -u
 
+WDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function error() {
     echo "ERROR: $*" >&2
     exit 1
@@ -30,7 +32,7 @@ machine="$(uname -m)"
 arch=${plat}-${machine}
 info "Setting arch=$arch"
 
-bundle_file="Bundle-latest-${arch}.tar.gz"
+bundle_file="$WDIR/Bundle-latest-${arch}.tar.gz"
 
 mkdir -p /opt/storageos
 
