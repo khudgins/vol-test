@@ -20,9 +20,6 @@ output "cluster_conn-{{JOBUID}}" {
 resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
   count = 3
 
-
-
-
   /* copy the bundled binaries */ 
   provisioner "file" {
     connection {

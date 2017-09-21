@@ -19,34 +19,6 @@ output "cluster_conn-{{JOBUID}}" {
 resource "null_resource" "copy-supervisor-config-{{JOBUID}}" {
   count = 3
 
-  /* setup fluentd */
-    provisioner "file" {
-    connection {
-      type = "ssh"
-      user = "root"
-      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
-      private_key = "${file(var.pvt_key_path)}"
-      timeout = "10s"
-    }
-
-    content = "deb http://packages.fluentbit.io/ubuntu xenial main"
-    destination = "/etc/apt/sources.list.d/fluentbit.list"
-  }
-
-    provisioner "remote-exec" {
-    connection {
-      type = "ssh"
-      user = "root"
-      host = "${element(module.storageos_cluster-{{JOBUID}}.ip-addrs, count.index)}"
-      private_key = "${file(var.pvt_key_path)}"
-      timeout = "10s"
-    }
-
-    inline = ["DEBIAN_FRONTEND=noninteractive apt -q -y install td-agent-bit",
-      "systemctl enable td-agent-bit --now"]
-
-  }
-
   /* copy the bundled binaries */ 
   provisioner "file" {
     connection {
