@@ -2,33 +2,33 @@
 
 load "../../test_helper"
 
-@test "Test: Install plugin for driver ($driver)" {
+@test "Test: Install plugin " {
   #skip "Faster for rev during development without it - leave driver installed"
-  run $prefix -t "docker plugin ls | grep $driver"
+  run $prefix -t "docker plugin ls | grep storageos"
   if [[ $status -eq 0 ]]; then
     skip
   fi
 
   run $prefix docker plugin disable storageos -f
   run $prefix docker plugin rm storageos
-  run $prefix docker plugin install --grant-all-permissions $driver $pluginopts
+  run $prefix docker plugin install --grant-all-permissions --alias storageos $driver $pluginopts
   assert_success
   sleep 60
 }
 
-@test "Test: Create volume using driver ($driver)" {
-  run $prefix docker volume create --driver $driver $createopts testvol
+@test "Test: Create volume using driver (storageos)" {
+  run $prefix docker volume create --driver storageos $createopts testvol
   assert_success
 }
 
-@test "Test: Confirm volume is created (volume ls) using driver ($driver)" {
+@test "Test: Confirm volume is created (volume ls)" {
   run $prefix docker volume ls
   assert_line --partial "testvol"
 }
 
-@test "Test: Confirm docker volume inspect works using driver ($driver)" {
+@test "Test: Confirm docker volume inspect works using driver (storageos)" {
   run $prefix docker volume inspect testvol
-  assert_line --partial "\"Driver\": \"$driver"
+  assert_line --partial "\"Driver\": \"storageos:latest"
 }
 
 @test "Start a container and mount the volume" {

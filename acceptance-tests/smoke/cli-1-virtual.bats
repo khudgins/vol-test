@@ -26,7 +26,7 @@ load "../../test_helper"
 
 @test "Confirm docker volume inspect works" {
   run $prefix docker volume inspect clivol
-  assert_line --partial "\"Driver\": \"$driver"
+  assert_line --partial "\"Driver\": \"storageos:latest"
 }
 
 @test "Start a container and mount the volume" {
