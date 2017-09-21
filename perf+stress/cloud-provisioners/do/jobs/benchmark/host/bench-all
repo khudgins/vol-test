@@ -1,0 +1,18 @@
+description: low level of stress testing
+jobs:
+  baseline:
+    exec: "bash"
+    args: ["-c", "~/node-scripts/bench-prepare/bench-prepare.sh"]
+    exclusive: true
+  run-fio-ro-raw-4k:
+    exec: "bash"
+    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh basic 4k raw"]
+    exclusive: true
+  run-fio-ro-rep-4k:
+    exec: "bash"
+    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh basic 4k 1-rep"]
+    exclusive: true
+  run-fio-check-raw-8mb:
+    exec: "bash"
+    args: ["-c", "BENCH=true ~/node-scripts/fio/run-fio.sh check 8192k no-cache"] 
+    exclusive: true
