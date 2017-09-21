@@ -23,7 +23,7 @@ for IaaS in $IAAS; do
     IAASDIR="$DIR/cloud-provisioners/${IaaS}/"
     
     # it is wasteful to run a job if identical depth and identical storageos version 
-    JOBUID="${PROFILE}-$(echo $STORAGEOS_VERSION | tr '.' '_')-$BUILD_TAG"
+    JOBUID="${PROFILE}-$(echo $STORAGEOS_VERSION | tr '.' '-')-$BUILD_TAG"
 
       file=$(mktemp)
 
