@@ -7,6 +7,10 @@ variable "tag" {
   description = "tag on cluster instances"
 }
 
+variable "machine_prefix" {
+  description = "prefix for hostname on machines"
+}
+
 variable "cluster_size" {
   description = "size of storageos cluster"
 }

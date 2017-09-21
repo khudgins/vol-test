@@ -19,7 +19,7 @@ data "template_file" "storageos-service" {
 
 resource "digitalocean_droplet" "storageos-ubuntu" {
   count = "${var.cluster_size}"
-  name = "machine-${count.index}"
+  name = "${var.machine_prefix}-${count.index}"
   region = "lon1"
   size = "${var.machine_size}"
   image = "${var.ubuntu_version}"
